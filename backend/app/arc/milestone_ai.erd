@@ -1,0 +1,132 @@
+
+// Tables
+admin [icon: user, color: red] {
+  id string pk
+  name string
+  email string 
+  password string
+}
+
+projects [icon: folder, color: green] {
+  id string pk
+  name string
+  description_pdf string
+}
+
+instructors [icon: user-check, color: blue] {
+  id string pk
+  name string
+  email string
+  password string
+}
+
+students [icon: user, color: yellow] {
+  id string pk
+  name string
+  email string
+  github_account string
+  password string
+}
+
+milestones [icon: flag, color: purple] {
+  id string pk
+  name string
+}
+
+checklists [icon: check-square, color: orange] {
+  id string pk
+  name string
+  deadline date
+  code_required boolean
+}
+
+pdfs [icon: file-text, color: gray] {
+  id string pk
+  file_path string
+  file_summary string
+  instructor_feedback string
+}
+
+github_accounts [icon: github, color: black] {
+  id string pk
+  username string
+}
+
+student_dashboard [icon: bar-chart, color: teal] {
+  id string pk
+  monthly_commits int
+  docs_uploaded int
+  milestone_progress string
+}
+
+instructor_dashboard [icon: tableau, color: magenta] {
+  id string pk
+  approved_pdf int
+  approved_code int 
+  feedbacks int 
+}
+
+support_team [icon: users, color: pink] {
+  id string pk
+  name string
+  role string
+  email string 
+  password string
+}
+
+bugs [icon: bug, color: brown] {
+  id string pk
+  description string
+  status string
+  name string 
+  source string 
+}
+
+chatbots [icon: message-circle, color: cyan] {
+  id string pk
+  project_id string
+}
+
+chat_history [icon: message-square, color: lightblue] {
+  id string pk
+  student_id string
+  timestamp datetime
+  student_message string
+  ai_message string
+}
+
+code_quality [icon: codepen, color: green] {
+  id string pk
+  code_summary string
+  instructor_feedback string
+}
+
+llm_feedback [icon: meta, color: blue] {
+  id string pk
+  feedback string
+  instructor_feedback string
+}
+
+// End of tables
+// Title
+title AI Software Project Management System
+
+// Relationships
+admin.projects > projects.id
+projects.instructor - instructors.id
+projects.students > students.id
+projects.milestones > milestones.id
+milestones.checklists > checklists.id
+checklists.pdfs > pdfs.id
+students.github_account - github_accounts.id
+students.dashboard - student_dashboard.id
+support_team.bugs > bugs.id
+projects.chatbot - chatbots.id
+chatbots.chat_history > chat_history.id
+students.chat_history > chat_history.id
+pdfs.uploaded_by - students.id
+checklists.code_quality > code_quality.id
+code_quality.written_by - students.id
+checklists.llm_feedback > llm_feedback.id
+llm_feedback.feedback_for - students.id
+instructor_dashboard.admin - instructors.id
