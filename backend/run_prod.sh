@@ -14,7 +14,7 @@ fi
 # Run the Python script
 if [ -f "main.py" ]; then
     echo "Starting the app..."
-    python main.py
+    uvicorn main:app --host 0.0.0.0 --port $PORT
 else
     echo "Error: 'main.py' not found in 'app' directory!"
     exit 1
