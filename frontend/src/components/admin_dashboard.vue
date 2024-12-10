@@ -42,13 +42,17 @@
                     </div>
                 </div>
             </nav>
-            <div class="dashboard-body my-4" :class="{ blurred: blocked }">
-                <div class="row mx-0 my-4">
-                    <div class="col-lg-8">
-                        <div class="card p-4">
-                            <h4 class="lh-2 my-2">Instructor Mapping</h4>
-                            <p class="lh-2"><b>18 total,</b>Instructors available</p>
-                            <div class="mapping-table w-100">
+            <div class="loading vh-100 d-flex justify-content-center align-items-center" v-if="loading">
+                <!-- <dotlottie-player src="https://lottie.host/60c22126-f9b3-4a76-881a-177db0874030/dvfbPo4NAa.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player> -->
+                loading...
+            </div>
+            <div class="done" v-else>
+                <div class="dashboard-body my-4" :class="{ blurred: blocked }" v-if="dashboardData">
+                    <div class="row mx-0 my-4">
+                        <div class="col-lg-8">
+                            <div class="card p-4" :style="{height: '50vh'}">
+                                <h4 class="lh-2 my-2">Instructor Mapping</h4>
+                                <p class="lh-2"><b>{{dashboardData.project_details.total_instructors}} total,</b>Instructors available</p>
                                 <div class="row m-0 w-100 py-2 table-header" :style="{borderBottom : '1px dotted var(--dark-border-light)'}">
                                     <div class="col-3 d-flex align-items-center">
                                         <b>instructore Name</b>
@@ -62,200 +66,140 @@
                                         <b>Finish Date</b>
                                     </div>
                                 </div>
-                                <div class="row m-0 w-100 py-2" :style="{borderBottom : '1px dotted var(--dark-border-light)'}">
-                                    <div class="col-3 row mx-0">
-                                        <div class="col-3">
-                                            <img src="@/assets/pfp1.png" alt="" width="30">
+                                <div class="mapping-table w-100 overflow-auto">
+                                    <div class="row m-0 w-100 py-2" :style="{borderBottom : '1px dotted var(--dark-border-light)'}" v-for="(projectDetails, projectIndex) in dashboardData.project_details.project_list" :key = "'project-' + projectIndex">
+                                        <div class="col-3 row mx-0">
+                                            <div class="col-3">
+                                                <img src="@/assets/pfp1.png" alt="" width="30">
+                                            </div>
+                                            <div class="col-9 d-flex align-items-center">{{projectDetails.instructor_name}}</div>
                                         </div>
-                                        <div class="col-9 d-flex align-items-center">Soumyadip</div>
-                                    </div>
-                                    <div class="col-2 d-flex align-items-center">SE204</div>
-                                    <div class="col-2 d-flex align-items-center">10</div>
-                                    <div class="col-3 row m-0 rounded-end" :style="{backgroundColor: 'var(--in-progress-bg-color)'}">
-                                        <div class="col-2 d-flex align-items-center justify-content-center">
-                                            <img src="@/assets/in-progress.png" alt="">
+                                        <div class="col-2 d-flex align-items-center">{{projectDetails.total_student}}</div>
+                                        <div class="col-2 d-flex align-items-center">{{projectDetails.total_milestones}}</div>
+                                        <div class="col-3 row m-0 rounded-end" :style="{backgroundColor: 'var(--in-progress-bg-color)'}">
+                                            <div class="col-2 d-flex align-items-center justify-content-center">
+                                                <img src="@/assets/in-progress.png" alt="">
+                                            </div>
+                                            <div class="col-9 d-flex align-items-center">{{projectDetails.status}}</div>
                                         </div>
-                                        <div class="col-9 d-flex align-items-center">In Progress</div>
-                                    </div>
-                                    <div class="col-2 d-flex align-items-center">30 days</div>
-                                </div>
-                                <div class="row m-0 w-100 py-2" :style="{borderBottom : '1px dotted var(--dark-border-light)'}">
-                                    <div class="col-3 row mx-0">
-                                        <div class="col-3">
-                                            <img src="@/assets/pfp2.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-9 d-flex align-items-center">Soumyadip</div>
-                                    </div>
-                                    <div class="col-2 d-flex align-items-center">SE205</div>
-                                    <div class="col-2 d-flex align-items-center">10</div>
-                                    <div class="col-3 row m-0 rounded-end" :style="{backgroundColor: 'var(--done-bg-color)'}">
-                                        <div class="col-2 d-flex align-items-center justify-content-center">
-                                            <img src="@/assets/done.png" alt="">
-                                        </div>
-                                        <div class="col-9 d-flex align-items-center">Done</div>
-                                    </div>
-                                    <div class="col-2 d-flex align-items-center">0 days</div>
-                                </div>
-                                <!-- <div class="row m-0 w-100 py-2" :style="{borderBottom : '1px dotted var(--dark-border-light)'}">
-                                    <div class="col-3 row mx-0">
-                                        <div class="col-3">
-                                            <img src="@/assets/pfp3.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-9 d-flex align-items-center">Soumyadip</div>
-                                    </div>
-                                    <div class="col-2 d-flex align-items-center">SE203</div>
-                                    <div class="col-2 d-flex align-items-center">10</div>
-                                    <div class="col-3 row m-0 rounded-end" :style="{backgroundColor: 'var(--in-progress-bg-color)'}">
-                                        <div class="col-2 d-flex align-items-center justify-content-center">
-                                            <img src="@/assets/in-progress.png" alt="">
-                                        </div>
-                                        <div class="col-9 d-flex align-items-center">In Progress</div>
-                                    </div>
-                                    <div class="col-2 d-flex align-items-center">30 days</div>
-                                </div> -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="card p-4 h-100">
-                            <div class="text-section">
-                                <h4 class="lh-2 my-2">Project Details</h4>
-                                <p class="lh-2 text-secondary">Select and upload project details</p>
-                            </div>
-                            <form  @submit.prevent="uploadFile">
-                                <div class="mb-3"> 
-                                    <input type="file" id="fileInput" accept="application/pdf" class="form-control h-100" row="2" @change="onFileChange">
-                                </div> 
-                                <div class="form-check my-2">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}">
-                                    <label class="form-check-label text-secondary" for="flexCheckDefault">
-                                        Milestone would be created using AI
-                                    </label>
-                                </div>
-                                <div class="row m-0"> 
-                                    <button type="submit" class="btn btn-outline-primary mx-0">
-                                        <span v-if="fileUploading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                            Create Project
-                                    </button> 
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mx-0 my-2">
-                    <div class="col-lg-7">
-                        <div class="card p-4">
-                            <div class="row m-0">
-                                <div class="col-7 d-flex align-items-start">
-                                    <h4 class="lh-2 mx-4">Engagement Tracker</h4>
-                                </div>
-                                <div class="col-5">
-                                    <div class="drop-down-container d-flex justify-content-end align-items-center">
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Semester
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">Semester 1</a></li>
-                                                <li><a class="dropdown-item" href="#">Semester 2</a></li>
-                                                <li><a class="dropdown-item" href="#">Semester 3</a></li>
-                                            </ul>
-                                        </div>
-
-                                    </div>
-                                    <div class="updated-container d-flex justify-content-end align-items-center mt-2">
-                                        <p class="text-secondary">Last updated <span>26 mins ago</span></p>
+                                        <div class="col-2 d-flex align-items-center">{{projectDetails.finish_date}} days</div>
                                     </div>
                                 </div>
                             </div>
-                            <Line :data="lineChartData" :options="lineChartOptions" />
                         </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="card p-4 h-100 bg-primary-subtle" >
-                            <h4 class="lh-2 my-2">Status Updates</h4>
-                            <div id="carouselExampleIndicators" class="carousel slide h-100">
-                                <div class="carousel-indicators">
-                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <div class="col-lg-4">
+                            <div class="card p-4 h-100">
+                                <div class="text-section">
+                                    <h4 class="lh-2 my-2">Project Details</h4>
+                                    <p class="lh-2 text-secondary">Select and upload project details</p>
                                 </div>
-                                <div class="carousel-inner h-100">
-                                    <div class="carousel-item bg-dark active card p-4 h-100 text-light">
-                                        <div class="text-section mx-4">
-                                            <div class="tag row mb-4 mt-2">
-                                                <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--in-progress-bg-color)'}">Feedback</div>
-                                                <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--done-bg-color)'}">Bugs</div> 
-                                            </div>
-                                            <h5 class="lh-2 my-2">Please Extend the deadlines for 10 days...</h5>
-                                            <p class="text-secondary mb-4">20.08.2024</p>
-                                            <div class="row m-0">
-                                                <div class="col-6 p-0 d-flex justify-content-start">
-                                                    <div class="like m-0 w-100">
-                                                        <div class="col-2 p-0">
-                                                            <img src="@/assets/like.png" alt="" width="20">
-                                                        </div>
-                                                        <div class="col-10">
-                                                            <b>8+</b> students
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6 p-0 d-flex justify-content-end">
-                                                    <div class="like m-0 w-100">
-                                                        <div class="col-2 p-0">
-                                                            <img src="@/assets/comment.png" alt="" width="20">
-                                                        </div>
-                                                        <div class="col-10">
-                                                            <b>7+</b> students
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="carousel-item bg-dark active card p-4 h-100 text-light">
-                                        <div class="text-section mx-4">
-                                            <div class="tag row mb-4 mt-2">
-                                                <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--in-progress-bg-color)'}">Feedback</div>
-                                                <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--done-bg-color)'}">Bugs</div> 
-                                            </div>
-                                            <h5 class="lh-2 my-2">Please Extend the deadlines for 10 days...</h5>
-                                            <p class="text-secondary mb-4">20.08.2024</p>
-                                            <div class="row m-0">
-                                                <div class="col-6 p-0 d-flex justify-content-start">
-                                                    <div class="like m-0 w-100">
-                                                        <div class="col-2 p-0">
-                                                            <img src="@/assets/like.png" alt="" width="20">
-                                                        </div>
-                                                        <div class="col-10">
-                                                            <b>8+</b> students
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6 p-0 d-flex justify-content-end">
-                                                    <div class="like m-0 w-100">
-                                                        <div class="col-2 p-0">
-                                                            <img src="@/assets/comment.png" alt="" width="20">
-                                                        </div>
-                                                        <div class="col-10">
-                                                            <b>7+</b> students
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <form  @submit.prevent="uploadFile">
+                                    <div class="mb-3"> 
+                                        <input type="file" id="fileInput" accept="application/pdf" class="form-control h-100" row="2" @change="onFileChange">
                                     </div> 
-                                </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
+                                    <div class="form-check my-2">
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}" required>
+                                        <label class="form-check-label text-secondary" for="flexCheckDefault">
+                                            Milestone would be created using AI
+                                        </label>
+                                    </div>
+                                    <div class="row m-0"> 
+                                        <button type="submit" class="btn btn-outline-primary mx-0">
+                                            <span v-if="fileUploading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                Create Project
+                                        </button> 
+                                    </div>
+                                </form>
                             </div>
-                        </div> 
+                        </div>
+                    </div>
+                    <div class="row mx-0 my-2">
+                        <div class="col-lg-7">
+                            <div class="card p-4">
+                                <div class="row m-0">
+                                    <div class="col-7 d-flex align-items-start">
+                                        <h4 class="lh-2 mx-4">Engagement Tracker</h4>
+                                    </div>
+                                    <div class="col-5">
+                                        <!-- <div class="drop-down-container d-flex justify-content-end align-items-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Semester
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="#">Semester 1</a></li>
+                                                    <li><a class="dropdown-item" href="#">Semester 2</a></li>
+                                                    <li><a class="dropdown-item" href="#">Semester 3</a></li>
+                                                </ul>
+                                            </div>
+                                        </div> -->
+                                        <div class="updated-container d-flex justify-content-end align-items-center mt-2">
+                                            <p class="text-secondary fw-light fs-6">All results updated </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Bar :data="barChartData" :options="barChartOptions"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="card p-4 h-100 bg-primary-subtle" >
+                                <h4 class="lh-2 my-2">Status Updates</h4>
+                                <div id="carouselExample" class="carousel slide">
+                                    <div class="carousel-inner">
+                                        <div 
+                                            class="carousel-item mx-2 bg-dark card p-4 text-light" 
+                                            v-for="(feedback, feedbackIndex) in dashboardData.all_feedback"
+                                            :key="'feedback-' + feedbackIndex"
+                                            :class="{'active': feedbackIndex === currentSlideIndex}"
+                                        >
+                                            <div class="text-section mx-4"> 
+                                                <div class="tag row mb-4 mt-2">
+                                                    <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" 
+                                                        :style="{backgroundColor : 'var(--in-progress-bg-color)'}">
+                                                        {{feedback.tag}}
+                                                    </div> 
+                                                </div>
+                                                <h5 class="lh-2 my-2">
+                                                    {{ feedback.feedback.length > 100 ? feedback.feedback.slice(0, 100) + '...' : feedback.feedback }}
+                                                </h5> 
+                                                <p class="text-secondary mb-4">{{ feedback.feedback_date }}</p>
+                                                
+                                                <div class="row m-0">
+                                                    <div class="col-6 p-0 d-flex justify-content-start">
+                                                        <div class="like m-0 w-100">
+                                                            <div class="col-2 p-0">
+                                                                <img src="@/assets/like.png" alt="" width="20">
+                                                            </div>
+                                                            <div class="col-10">
+                                                                <b>{{ feedback.like_count }}</b> students
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6 p-0 d-flex justify-content-end">
+                                                        <div class="like m-0 w-100">
+                                                            <div class="col-2 p-0">
+                                                                <img src="@/assets/comment.png" alt="" width="20">
+                                                            </div>
+                                                            <div class="col-10">
+                                                                <b> {{ feedback.comment_count }}</b> students
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev" @click="goToPrevSlide">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next" @click="goToNextSlide">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            </div> 
+                        </div>
                     </div>
                 </div>
             </div>
@@ -264,25 +208,25 @@
 </template>
 
 <script> 
-    import { Line, Doughnut } from 'vue-chartjs';
-    import { projectReportUpload } from "@/services/appService";
+    import { Line, Doughnut, Bar } from 'vue-chartjs';
+    import {getAdminDashboard, projectReportUpload} from '@/services/appService';
     import Swal from 'sweetalert2'; 
 
     import {
-        Chart as ChartJS, Title, Tooltip, Legend, LineElement, 
+        Chart as ChartJS, Title, Tooltip, Legend, LineElement, BarElement,
         ArcElement, CategoryScale, LinearScale, Filler, PointElement,
     } from 'chart.js';
  
     ChartJS.register( 
         Title, Tooltip, Legend, LineElement, ArcElement, 
-        CategoryScale, LinearScale, Filler, PointElement
+        CategoryScale, LinearScale, Filler, PointElement, BarElement
     );
 
  
     export default {
         // name: 'admin-dashboard',
         components: {
-            Doughnut, Line
+            Doughnut, Line, Bar
         },
         data() {
             return {      
@@ -291,30 +235,31 @@
                 blocked: true,    
                 selectedOption: "dashboard",  
                 selectedFile: null,  
-                fileUploading: false,     
-                lineChartData: {
+                fileUploading: false,    
+                currentSlideIndex: 0, 
+                dashboardData: null,
+                loading: false,
+                barChartData: {
                     labels: ['January', 'February', 'March', 'April', 'May', 'June'],
                     datasets: [
                         {
                             label: 'Projects',
                             data: [10, 20, 30, 25, 15, 35],
+                            backgroundColor: 'rgba(0, 123, 255, 0.5)',  
                             borderColor: '#007BFF',
-                            backgroundColor: 'rgba(76, 175, 80, 0)',
-                            fill: true,
-                            tension: 0.4,
+                            borderWidth: 1,
                         },
                         {
                             label: 'Students',
                             data: [5, 10, 15, 20, 25, 30],
+                            backgroundColor: 'rgba(52, 58, 64, 0.5)',  
                             borderColor: '#343A40',
-                            backgroundColor: 'rgba(33, 150, 243, 0)',
-                            fill: true,
-                            tension: 0.4,
+                            borderWidth: 1,
                         },
                     ],
                 },
-                lineChartOptions: {
-                    responsive: true, 
+                barChartOptions: {
+                    responsive: true,
                     scales: {
                         x: {
                             title: {
@@ -322,8 +267,8 @@
                                 text: 'Months',
                             },
                             grid: {
-                                display: false
-                            }
+                                display: false,
+                            },
                         },
                         y: {
                             title: {
@@ -376,7 +321,34 @@
                 } finally {
                     this.fileUploading = false; 
                 }
-            }
+            }, 
+            async fetchDashboard() {
+                try {
+                    const response = await getAdminDashboard(this.user_id);
+                    this.dashboardData = response;  
+                    this.barChartData = response.progress_report;
+                    console.log(response)
+                } catch (error) {
+                    this.error = "Failed to fetch dashboard data. Please try again later.";
+                    console.error("API error:", error);
+                } finally {
+                    this.loading = false;  
+                }
+            }, 
+            goToPrevSlide() {
+                if (this.currentSlideIndex > 0) {
+                    this.currentSlideIndex--;
+                } else {
+                    this.currentSlideIndex = this.dashboardData.all_feedback.length - 1;
+                }
+            },  
+            goToNextSlide() {
+                if (this.currentSlideIndex < this.dashboardData.all_feedback.length - 1) {
+                    this.currentSlideIndex++;
+                } else {
+                    this.currentSlideIndex = 0;
+                }
+            },
         },
         mounted() { 
             const storedUserId = localStorage.getItem('user_id');
@@ -407,6 +379,8 @@
             } else { 
                 this.$router.push('/login');
             }
+
+            this.fetchDashboard();
         },
     };
 </script>

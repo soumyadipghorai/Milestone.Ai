@@ -10,16 +10,16 @@
                     <div class="collapse navbar-collapse text-center justify-content-end" id="toggleCollapse">
                         <ul class="navbar-nav d-flex align-items-center">
                             <li class="h-100 nav-link"> 
-                                <router-link :to="isLoggedIn ? `/project/${user_id}` : '/login'" class="text-decoration-none selected-role text-primary">
+                                <router-link :to="isLoggedIn ? `/project/${currentProjectID}/${user_id}` : '/login'" class="text-decoration-none selected-role text-primary">
                                     My Project
                                 </router-link>
                             </li>
-                            <li class="h-100 nav-link"> 
+                            <li class="h-100 nav-link" v-if="role === 'student'"> 
                                 <router-link :to="isLoggedIn ? `/student-dashboard/${user_id}` : '/login'" class="text-decoration-none text-reset">
                                     Dashboard
                                 </router-link>
                             </li> 
-                            <li>
+                            <li v-if="role == 'student'">
                                 <div class="dropdown h-100 nav-link d-flex align-items-center py-0">
                                     <a class=" dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <img src="@/assets/notification.png" alt="" width="30">
@@ -54,53 +54,63 @@
                 </div>
                 <div class="container py-4" v-else>
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-8 py-4">
                             <div class="card p-4">
-                                <h4 class="lh-2 px-4 pt-4 pb-2">{{ projectDetails.name }}</h4>
-                                <p class="lh-2 text-secondary px-4">{{ projectDetails.description.length > 200 ? projectDetails.description.slice(0, 200) + '...' : projectDetails.description }}</p>
-                                <!-- <div class="row" v-for="milestone in projectDetails.milestones" :key="milestone.id"> 
-                                    <div class="col-auto text-center flex-column d-none d-sm-flex">
-                                        <div class="row h-50">
-                                            <div class="col">&nbsp;</div>
-                                            <div class="col">&nbsp;</div>
+                                <h4 class="lh-2 px-4 pt-4 pb-2">{{ projectDashboardDetails.project_details.name }}</h4>
+                                <p class="lh-2 text-secondary px-4">{{ projectDashboardDetails.project_details.description.length > 200 ? projectDashboardDetails.project_details.description.slice(0, 200) + '...' : projectDashboardDetails.project_details.description }}</p>
+                                <div class="milestone-container" v-for="milestone in projectDashboardDetails.project_details.milestones" :key="milestone.id">
+                                    
+                                    <div class="row" v-if="milestone.index === 'past'">
+                                        <div class="col-auto text-center flex-column d-none d-sm-flex">
+                                            <div class="row h-50">
+                                                <div class="col">&nbsp;</div>
+                                                <div class="col">&nbsp;</div>
+                                            </div>
+                                            <h5 class="m-2">
+                                                <button class="btn btn-outline-secondary disabled">
+                                                    <span class="badge rounded-pill bg-light border">&nbsp;</span>
+                                                </button>
+                                            </h5>
+                                            <div class="row h-50">
+                                                <div class="col border-end order">&nbsp;</div>
+                                                <div class="col">&nbsp;</div>
+                                            </div>
                                         </div>
-                                        <h5 class="m-2">
-                                            <button class="btn btn-outline-primary disabled">
-                                                <span class="badge rounded-pill bg-light border">&nbsp;</span>
-                                            </button>
-                                        </h5>
-                                        <div class="row h-50">
-                                            <div class="col border-end order">&nbsp;</div>
-                                            <div class="col">&nbsp;</div>
-                                        </div>
-                                    </div> 
-                                    <div class="col py-2">
-                                        <div class="card p-4">
-                                            <div class="card-body">
-                                                <div class="row m-0">
-                                                    <div class="col-8 p-0">
-                                                        <h4 class="card-title text-muted">{{ milestone.name }}</h4>
-                                                    </div>
-                                                    <div class="col-4 p-0">
-                                                        <span class="lh-1 text-secondary d-flex justify-content-end align-items-start">
-                                                            <p class="rounded-4 border px-3 py-1 fs-6">{{ milestone.deadline }}</p>
-                                                        </span>
-                                                    </div>
-                                                </div> 
-                                                <p class="card-text text-secondary">{{ milestone.description }}</p>
+                                        <div class="col py-2">
+                                            <div class="card p-4 border">
+                                                <div class="card-body">
+                                                    <div class="row m-0">
+                                                        <div class="col-8 p-0">
+                                                            <h4 class="card-title text-muted">{{ milestone.name }}</h4>
+                                                        </div>
+                                                        <div class="col-4 p-0">
+                                                            <span class="lh-1 text-secondary d-flex justify-content-end align-items-start">
+                                                                <p class="rounded-4 border px-3 py-1 fs-6">{{ milestone.deadline }}</p>
+                                                            </span>
+                                                        </div>
+                                                    </div> 
+                                                    <p class="card-text text-secondary">{{ milestone.description }}</p>
+                                                
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>  -->
-                                <div class="milestone-container" v-for="milestone in projectDetails.milestones" :key="milestone.id">
-                                    <div class="row">
+                                    <div class="row" v-else>
                                         <div class="col-auto text-center flex-column d-none d-sm-flex">
                                             <div class="row h-50">
                                                 <div class="col border-end">&nbsp;</div>
                                                 <div class="col">&nbsp;</div>
                                             </div>
                                             <h5 class="m-2">
-                                                <button class="btn btn-outline-primary"><span class="badge rounded-pill bg-success">&nbsp;</span></button>
+                                                <button 
+                                                    class="btn" 
+                                                    :class="milestone.index === 'current' ? 'btn-outline-primary' : 'btn-outline-secondary'"
+                                                >
+                                                    <span 
+                                                        class="badge rounded-pill" 
+                                                        :class="milestone.index === 'current' ? 'bg-primary' : 'bg-light'"
+                                                    >&nbsp; </span>
+                                                </button>
                                             </h5>
                                             <div class="row h-50">
                                                 <div class="col border-end">&nbsp;</div>
@@ -108,7 +118,10 @@
                                             </div>
                                         </div>
                                         <div class="col py-2">
-                                            <div class="card p-4 border-primary shadow">
+                                            <div 
+                                                class="card p-4"
+                                                :class="milestone.index === 'current' ? 'border-primary shadow' : ''"
+                                            >
                                                 <div class="card-body">
                                                     <div class="row m-0">
                                                         <div class="col-8 p-0">
@@ -134,23 +147,28 @@
                                                                     <div class="accordion-body">
                                                                         <p class="checklist-description text-secondary">{{ checklist.description }}.</p>
     
-                                                                        <div class="upload-section">
-                                                                            <form v-if="!checklist.code_required">
+                                                                        <div class="upload-section" v-if="role === 'student'">
+                                                                            <form v-if="!checklist.code_required" @submit.prevent="analyzeStudentReport">
                                                                                 <div class="mb-3"> 
-                                                                                    <input type="file" id="fileInput" accept="application/pdf" class="form-control h-100" row="2">
+                                                                                    <input type="hidden" name="checklist_id" :value="checklist.id" id="uploadingChecklistId"/>
+                                                                                    <input type="file" id="fileInput" accept="application/pdf" class="form-control h-100" row="2" required>
                                                                                 </div> 
                                                                                 <div class="form-check my-2">
-                                                                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}">
+                                                                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}" required>
                                                                                     <label class="form-check-label text-secondary" for="flexCheckDefault">
                                                                                         Document will be analyzed by AI
                                                                                     </label>
                                                                                 </div> 
                                                                                 <div class="col-4 d-flex justify-content-start p-0">
-                                                                                    <button type="submit" class="btn btn-primary mx-0">Upload</button>
+                                                                                    <button type="submit" class="btn btn-outline-primary mx-0">
+                                                                                        <span v-if="fileUploading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                                                        Upload
+                                                                                    </button>
                                                                                 </div>  
                                                                             </form>
                                                                             <form v-else @submit.prevent="analyzeCode">
                                                                                 <div class="mb-3">
+                                                                                    <input type="hidden" name="checklist_id" :value="checklist.id" id="uploadingCodeChecklistId"/>
                                                                                     <label for="dropdown1" class="form-label">Select Repo</label>
                                                                                     <select class="form-select" id="dropdown1" v-model="selectedRepo" @change="fecthAllBranch">
                                                                                         <option value="select repo" disabled>Select an option</option>
@@ -168,6 +186,12 @@
                                                                                         </option>
                                                                                     </select>
                                                                                 </div>
+                                                                                <div class="form-check my-2">
+                                                                                    <input class="form-check-input" type="checkbox" value="" id="flexcodeCheckDefault" :style="{backgroundColor: 'transparent', color: 'black'}" required>
+                                                                                    <label class="form-check-label text-secondary" for="flexcodeCheckDefault">
+                                                                                        Codes will be analyzed by AI
+                                                                                    </label>
+                                                                                </div> 
                                                                                 <button type="submit" class="btn btn-outline-primary mx-0">
                                                                                     <span v-if="analyzingCode" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                                                                         Submit code
@@ -184,66 +208,67 @@
                                         </div>
                                     </div> 
                                 </div>
-                                <!-- <div class="row">
-                                    <div class="col-auto text-center flex-column d-none d-sm-flex">
-                                        <div class="row h-50">
-                                            <div class="col border-end">&nbsp;</div>
-                                            <div class="col">&nbsp;</div>
-                                        </div>
-                                        <h5 class="m-2">
-                                            <span class="badge rounded-pill bg-light border">&nbsp;</span>
-                                        </h5>
-                                        <div class="row h-50">
-                                            <div class="col">&nbsp;</div>
-                                            <div class="col">&nbsp;</div>
-                                        </div>
-                                    </div>
-                                    <div class="col py-2">
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="float-end text-muted">Thu, Jan 12th 2021 11:30 AM</div>
-                                                <h4 class="card-title">Day 4 Wrap-up</h4>
-                                                <p>Join us for lunch in Bootsy's cafe across from the Campus Center.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 py-4">
+                            <div class="card p-4 mb-3" :style="{height: '60vh'}" v-if="role === 'student'">
+                                <h4 class="lh-2">Uploaded Documents</h4>
+                                <div class="file-container overflow-auto mt-4">
+                                    <div class="accordion accordion-flush" id="accordionFlushExample">
+                                        <div class="accordion-item" v-for="(uploadedPdf, uploadedPdfIndex) in projectDashboardDetails.uploaded_docs" :key="uploadedPdf.id">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed rounded-2 border my-2" type="button" data-bs-toggle="collapse" :data-bs-target="'#stduent-docs-' + uploadedPdf.id " aria-expanded="false" :style="{backgroundColor: 'var(--primary-background-color)'}">
+                                                    {{uploadedPdf.name}}
+                                                </button>
+                                            </h2>
+                                            <div :id="'stduent-docs-' + uploadedPdf.id" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                                                <div class="accordion-body">
+                                                    <ul class="list-group list-group-flush">
+                                                       <li v-for="(reconmmendation, reconmmendationIndex) in uploadedPdf.ai_response.recommendations" class="list-group-item">
+                                                            {{ reconmmendation }}
+                                                       </li> 
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>  -->
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="card p-4 mb-3" :style="{height: '50vh'}">
-                                <h4 class="lh-2">Uploaded Documents</h4>
+                            <div class="card p-4 mb-3" :style="{height: '50vh'}" v-if="role === 'instructor'">
+                                <h4 class="lh-2">Document Analysis</h4>
                                 <div class="file-container overflow-auto mt-4">
-                                    <div class="row mx-0 my-3 p-2 rounded-2 border" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                        <div class="col-2 d-flex justify-content-center align-items-center">
-                                            <img src="@/assets/pdf_icon.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-10 d-flex justify-content-start align-items-center">
-                                            semester_1.pdf
-                                        </div>
-                                    </div>
-                                    <div class="row mx-0 my-3 p-2 rounded-2 border" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                        <div class="col-2 d-flex justify-content-center align-items-center">
-                                            <img src="@/assets/pdf_icon.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-10 d-flex justify-content-start align-items-center">
-                                            semester_1.pdf
-                                        </div>
-                                    </div>
-                                    <div class="row mx-0 my-3 p-2 rounded-2 border" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                        <div class="col-2 d-flex justify-content-center align-items-center">
-                                            <img src="@/assets/pdf_icon.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-10 d-flex justify-content-start align-items-center">
-                                            semester_1.pdf
-                                        </div>
-                                    </div>
-                                    <div class="row mx-0 my-3 p-2 rounded-2 border" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                        <div class="col-2 d-flex justify-content-center align-items-center">
-                                            <img src="@/assets/pdf_icon.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-10 d-flex justify-content-start align-items-center">
-                                            semester_1.pdf
+                                    <div class="accordion accordion-flush" id="accordionFlushExample">
+                                        <div class="accordion-item" v-for="(uploadedPdf, uploadedPdfIndex) in projectDashboardDetails.uploaded_docs" :key="uploadedPdf.id">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed rounded-2 border my-2" type="button" data-bs-toggle="collapse" :data-bs-target="'#instructor-docs-' + uploadedPdf.id " aria-expanded="false" :style="{backgroundColor: 'var(--primary-background-color)'}">
+                                                    {{uploadedPdf.name}}
+                                                </button>
+                                            </h2>
+                                            <div :id="'instructor-docs-' + uploadedPdf.id" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                                                <div class="accordion-body">
+                                                    <h6 class="lh-2">Summary : </h6>
+                                                    <p class="text-secondary lh-2">{{ uploadedPdf.ai_response.summary }}</p>
+
+                                                    <h6 class="lh-2">Additional Notes : </h6>
+                                                    <p class="text-secondary lh-2">{{ uploadedPdf.ai_response.additional_notes }}</p>
+
+                                                    <h6 class="lh-2">Conclusions : </h6>
+                                                    <p class="text-secondary lh-2" v-for="(conclusion, conclusionIndex) in uploadedPdf.ai_response.conclusions" :key="conclusionIndex">{{ conclusion }}</p>
+                                                    
+                                                    <h6 class="lh-2">Key Insights : </h6>
+                                                    <p class="text-secondary lh-2" v-for="(insight, insightIndex) in uploadedPdf.ai_response.key_insights" :key="insightIndex">{{ insight }}</p> 
+                                                    
+                                                    <div class="tags d-flex">
+                                                        <div class="rounded-2 p-2 border m-2" :style="{backgroundColor: 'var(--primary-background-color)'}" v-for="(tag, tagIndex) in uploadedPdf.ai_response.tags" :key="tagIndex">{{ tag }}</div>
+                                                    </div>
+
+                                                    <button class="btn btn-outline-primary">
+                                                        <a class="text-decoration-none" :href="uploadedPdf.file_path" :download="uploadedPdf.name">
+                                                            Download 
+                                                        </a>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -273,37 +298,42 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card p-4" :style="{height: '50vh'}">
+                            <div class="card p-4" :style="{height: '70vh'}">
                                 <h4 class="lh-2">Feedback</h4>
-                                <div class="accordion accordion-flush" id="accordionFlushExample">
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                                            Accordion Item #1
-                                        </button>
-                                        </h2>
-                                        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                                        <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                                            Accordion Item #2
-                                        </button>
-                                        </h2>
-                                        <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                                        <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-                                            Accordion Item #3
-                                        </button>
-                                        </h2>
-                                        <div id="flush-collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-                                        <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.</div>
+                                <div class="file-container overflow-auto mt-4">
+                                    <div class="accordion accordion-flush" id="accordionFlushExample">
+                                        <div class="accordion-item" v-for="(codeFeedback, codeFeedbackIndex) in projectDashboardDetails.code_feedback" :key="codeFeedback.id">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#code-feedback-student-' + codeFeedback.id " aria-expanded="false">
+                                                    {{codeFeedback.name}}
+                                                </button>
+                                            </h2>
+                                            <div :id="'code-feedback-student-' + codeFeedback.id" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                                                <div class="accordion-body">
+                                                    <div class="student-feedback mb-3">
+                                                        <h5 class="lh-2 my-3">Code Quality Check:</h5>
+                                                        <div class="testcase m-2 border-bottom" v-for="(result, testCase, testCaseIndex) in codeFeedback.overall_summary" :key="testCaseIndex">
+                                                            <h6 class="text-dark">{{ testCase }} : </h6>
+                                                            <p class="p-0" :class="{ 'text-success': result.result === 'passed', 'text-danger': result.result !== 'passed' }">{{ result.result }}</p>
+                                                            <p class="text-secondary p-0">{{result.feedback.description}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="instructor-feedback mb-3" v-if="role !== 'student'">
+                                                        <h5 class="lh-2 my-3">Overall Feedback</h5>
+                                                        <div class="testcase m-2 border-bottom" v-for="(keyPoint, keyPointIndex) in codeFeedback.instructor_feedback.key_points" :key="keyPointIndex">
+                                                            <h6 class="text-dark">{{ keyPoint.title }} : </h6> 
+                                                            <p class="text-secondary p-0">{{keyPoint.description}}</p>
+                                                        </div>
+                                                        <h5 class="lh-2 my-3">Commit Summary</h5>
+                                                        <div class="testcase m-2 border-bottom" v-for="(keyPoint, keyPointIndex) in codeFeedback.commit_summary.key_points" :key="keyPointIndex">
+                                                            <h6 class="text-dark">{{ keyPoint.title }} : </h6> 
+                                                            <p class="text-secondary p-0">{{keyPoint.description}}</p>
+                                                        </div>
+
+                                                        <a :href="codeFeedback.project_url" class="btn btn-outline-primary" target="_blank">Check Repo</a>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -319,11 +349,15 @@
 
 <script>  
     import Swal from 'sweetalert2'; 
-    import {getProjectDetails, getAllRepos, getAllBranches, analyzeCode} from '@/services/appService'; 
+    import {getStudentProjectDetails, getAllRepos, getAllBranches, analyzeCode, studentReportUpload} from '@/services/appService'; 
 
     export default {
         props: {
             project_id: {
+                type: String,
+                required: true,
+            },
+            stduent_id: {
                 type: String,
                 required: true,
             },
@@ -334,7 +368,7 @@
                 role: null,
                 blocked: true,    
                 selectedOption: "dashboard",   
-                projectDetails: null,    
+                projectDashboardDetails: null,    
                 loading: true,  
                 repos: null,
                 selectedRepo: null,
@@ -342,6 +376,8 @@
                 selectedBranch: null,
                 allBranches: null,
                 analyzingCode: false, 
+                currentProjectID: null, 
+                fileUploading: false,
             }
         },
         computed: { 
@@ -362,9 +398,11 @@
             },
             async fetchProjectDetails() {
                 try {
-                    const response = await getProjectDetails(this.project_id);
-                    this.projectDetails = response;  
-                    // console.log(response)
+                    console.log(this.stduent_id, this.project_id);
+                    const response = await getStudentProjectDetails(this.stduent_id);
+                    this.projectDashboardDetails = response;  
+                    this.currentProjectID = response.project_details.id;
+                    console.log(response)
                 } catch (error) {
                     this.error = "Failed to fetch dashboard data. Please try again later.";
                     console.error("API error:", error);
@@ -374,7 +412,7 @@
             },
             async fetchAllRepos() {
                 try {
-                    const response = await getAllRepos(this.user_id);
+                    const response = await getAllRepos(this.stduent_id);
                     this.repos = response;  
                     console.log('all repos --> ',response)
                 } catch (error) {
@@ -387,7 +425,7 @@
             async fecthAllBranch() {
                 if (this.selectedRepo) {
                     try { 
-                        const response = await getAllBranches(this.user_id, this.selectedRepo);
+                        const response = await getAllBranches(this.stduent_id, this.selectedRepo);
                         this.allBranches = response;
                         this.showBranchDropdown = true;
                         console.log(response, 'all branches')
@@ -402,16 +440,47 @@
                     const response = await analyzeCode({
                         user_id: this.user_id,
                         repo_name: this.selectedRepo,
-                        branch_name: this.selectedBranch
+                        branch_name: this.selectedBranch, 
+                        checklist_id: document.getElementById("uploadingCodeChecklistId").value 
                     }); 
                     console.log('analysis result --> ', response)
                 } catch (error) {
                     console.error('Error fetching Dropdown 2 options:', error);
                 } finally{
-                    this.analyzingCode = false 
+                    this.analyzingCode = false; 
+                    this.fetchProjectDetails();
                 }
             }, 
-            
+            async analyzeStudentReport() {
+                this.fileUploading = true;
+                const fileInput = document.getElementById("fileInput");
+                const checklistID = document.getElementById("uploadingChecklistId").value; 
+                const file = fileInput.files[0]; 
+                if (!file) {
+                    alert("Please select a file!");
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("checklist_id", checklistID);
+                formData.append("user_id", this.user_id);
+
+                // for (const [key, value] of formData.entries()) {
+                //     console.log(`${key}:`, value);
+                // }
+                
+                try { 
+                    const response = await studentReportUpload(formData); 
+                    // this.$router.push(`/project/${this.currentProjectID}/${this.user_id}`);  
+                } catch (error) {
+                    console.error('Error fetching Dropdown 2 options:', error);
+                } finally {
+                    this.fileUploading = false;
+                    this.fetchProjectDetails();
+                    fileInput.value = null;
+                }
+            },
         },
         mounted() { 
             const storedUserId = localStorage.getItem('user_id');

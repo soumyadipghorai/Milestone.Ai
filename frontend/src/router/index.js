@@ -52,7 +52,7 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path:'/project/:project_id/:user_id',
+            path:'/project/:project_id/:stduent_id',
             name:'project',
             component:project, 
             props: true, 

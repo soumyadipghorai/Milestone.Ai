@@ -4,7 +4,7 @@ from utils.github_utils import GitHubBase
 import random
 from _temp.config import LANGUAGE_TO_EXTENSION
 from tqdm import tqdm
-from models.db_models import LanguageGuidelines
+from models.db_models import LanguageGuidelines, CodeQuality, GitHubAccount
 from models.database import get_db
 import json
 # from utils.generate_report import FeedbackGenerator
@@ -13,6 +13,8 @@ from AI_service.llm_ops.llm_base import LLMBase
 from AI_service.schema.github_summarize import CodeSummarizationResult, OverallSummary, TestReport
 from store.prompt_store import GUIDELINE_CHECK, SUMMARIZE_CODE, TEST_CASE_FAILED, TEST_CASE_PASSED
 import time 
+from datetime import datetime
+from utils.db_operations import add_entry
 
 db = get_db()
 
@@ -131,8 +133,8 @@ class StudentReport(TestFailed, TestPassed) :
 
 class CodeAnalyzer(LLMBase, FetchGitContent) : 
     def __init__(
-            self, username: str, repo_name:str = None, branch_name: str = None, code_coverage: float = 0.3, 
-            language_coverage: float = 0.5, token_limit: int = 5000
+            self, username: str, student_id: str = "", checklist_id: int = 0, repo_name:str = None, branch_name: str = None, code_coverage: float = 0.3, 
+            language_coverage: float = 0.5, token_limit: int = 5000, save_to_db: bool = True
         ) -> None :  
         FetchGitContent.__init__(self, username=username, repo_name=repo_name)  
         LLMBase.__init__(self, prompt=GUIDELINE_CHECK, schema=CodeSummarizationResult, save_history = True)  
@@ -140,6 +142,9 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
         self.language_coverage = language_coverage
         self.token_limit = token_limit
         self.branch_name = branch_name
+        self.save_to_db = save_to_db
+        self.checklist_id = checklist_id
+        self.student_id = student_id
     
     def __find_used_languages(self) -> dict:
         response = requests.get(self.url_endpoint+'/languages') 
@@ -235,5 +240,22 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
             code_report["instructor_feedback"] = InstructorReport().generate_overall_feedback(text_content=code_report["history"]["overall_feedback"])
             code_report["instructor_commit_summary"] = InstructorReport().generate_overall_feedback(text_content= code_report["commit_message"])
             code_report["student_feedback"] = StudentReport().generate_student_feedback(report= code_report["history"])
-            
+
+            if self.save_to_db :  
+                new_code_quality = CodeQuality( 
+                    instructor_feedback = json.dumps(code_report["instructor_feedback"]), overall_summary = json.dumps(code_report["student_feedback"]),
+                    commit_summary = json.dumps(code_report["instructor_commit_summary"]), checklist_id = self.checklist_id, 
+                    upload_time = datetime.now(), repo_name = self.repo_name, branch_name = self.branch_name, 
+                    written_by = self.student_id
+                )
+
+                new_github_entry = GitHubAccount(
+                    username = self.username, total_commit = code_report["committer_count"][self.username], 
+                    total_language = json.dumps(code_report["languages"]), repo_name = self.repo_name, 
+                    entry_time = datetime.now(), student_id = self.student_id
+                )
+    
+                add_entry(entry = new_github_entry, success_key="id", success_value= new_github_entry.id)
+                add_entry(entry = new_code_quality, success_key="id", success_value= new_code_quality.id)
+  
             return code_report

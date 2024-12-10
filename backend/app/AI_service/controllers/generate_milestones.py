@@ -62,7 +62,8 @@ class MilestoneGenerator(LLMBase) :
             new_project = Project( 
                 id = str(self.unique_id), name = llm_output["project_title"], 
                 description = llm_output["project_description"],
-                file_path = pdf_file_path, deadline = project_target_date
+                file_path = pdf_file_path, deadline = project_target_date, 
+                creation_date = datetime.now()
             )
             project_entry = add_entry(
                 entry = new_project, success_key="id", 

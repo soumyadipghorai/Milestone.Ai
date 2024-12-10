@@ -12,7 +12,8 @@ MILESTONE_BREAKDOWN = """
     > Each task description must be atleast 500 words.
 
     ```````
-    NOTE: in the milestones only given milestone name no milestone numbers and there shouldn't be any more than 5 milestones.
+    NOTE: there shouldn't be any more than 5 milestones and double check for `coding_required` 
+    Verify if coding is really required to complete the task.
 """
 
 SUMMARIZE_PDF = """

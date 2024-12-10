@@ -1,5 +1,10 @@
 <template> 
     <div class="support-page"  :style="{ backgroundColor: 'var(--primary-background-color)' }"> 
+        <div class="loading vh-100 d-flex justify-content-center align-items-center" v-if="loading">
+            <!-- <dotlottie-player src="https://lottie.host/60c22126-f9b3-4a76-881a-177db0874030/dvfbPo4NAa.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player> -->
+            loading...
+        </div>
+        <div class="done" v-else>
             <div class="row">
                 <div class="col-lg-6">
                     <div class="mx-4 px-4">
@@ -24,7 +29,7 @@
                                                         <span class="visually-hidden">New alerts</span>
                                                     </span>
                                                 </a>
-
+    
                                                 <ul class="dropdown-menu">
                                                     <li><a class="dropdown-item" href="#">Action</a></li>
                                                     <li><a class="dropdown-item" href="#">Another action</a></li>
@@ -52,11 +57,11 @@
                                         <div class="info">
                                             <div class="text-section" :style="{borderBottom : '1px dotted var(--dark-border-light)'}">
                                                 <h5 class="lh-2 mt-4 mb-2 fs-5">Total Bugs</h5>
-                                                <p class="text-secondary fs-6">32 in last week</p>
+                                                <p class="text-secondary fs-6">{{ dashboardData.metric.error}} total Errors</p>
                                             </div>
                                             <div class="text-section" :style="{borderBottom : '1px dotted var(--dark-border-light)'}">
                                                 <h5 class="lh-2 mt-4 mb-2 fs-5">Total Warnings</h5>
-                                                <p class="text-secondary fs-6">16 in last week</p>
+                                                <p class="text-secondary fs-6">{{ dashboardData.metric.warning }} total Warnings</p>
                                             </div>
                                         </div>
     
@@ -66,7 +71,7 @@
                                     </div>
                                 </div>
                             </div> 
-                            <div class="row mt-4">
+                            <!-- <div class="row mt-4">
                                 <div class="col-lg-6">
                                     <div class="card p-4" :style="{height: '50vh', backgroundColor: 'var(--primary-dark-color)'}">
                                         <h4 class="lh-2 mb-4 text-light">AI Suggestions</h4>
@@ -103,12 +108,12 @@
                                     </div>
                                     </div>
                                 </div>
-                                </div>
-
+                            </div> -->
+    
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6" :style="{ backgroundColor: 'var(--primary-dark-color)' }" :class="{ blurred: blocked }">
+                <div class="col-lg-6" :style="{ backgroundColor: 'var(--primary-dark-color)'}" :class="{ blurred: blocked }">
                     <div class="row g-2 mx-4 my-0 py-2">
                         <div class="col-3">
                             <button class="btn btn-danger text-light">Current Logs</button>
@@ -116,15 +121,29 @@
                         <div class="col-3">
                             <button class="btn btn-outline-success text-success">Current Info</button>
                         </div> 
+                    </div> 
+                    <div class="card p-4" :style="{backgroundColor : 'var(--primary-dark-color)', height: '100vh', border: 'none'}">
+                        <div class="logs-holder overflow-auto"> 
+                            <div class="log-message" v-for="(logMessage, logMessageIndex) in dashboardData.info" :key="'info-'+logMessageIndex">
+                                <p class="lh-2">
+                                    <span class="text-secondary">{{ logMessage.time_stamp }} - </span>
+                                    <span class="text-danger">{{ logMessage.source }} - </span>
+                                    <span class="text-primary">{{ logMessage.log_type }} - </span>
+                                    <span class="text-light">{{ logMessage.log_message }}</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div> 
+        </div>
     </div>
 </template>
 
 <script> 
     import { Line, Doughnut } from 'vue-chartjs';
     import Swal from 'sweetalert2'; 
+    import {getSupportDashboard} from '@/services/appService';
 
     import {
         Chart as ChartJS, Title, Tooltip, Legend, LineElement, 
@@ -145,12 +164,11 @@
         },
         data() {
             return {
-                imageUrl: 'src/assets/bg-img-1.jpg', 
-                imageUrl2: 'src/assets/bg-img-2.jpg', 
-                imageUrl3: 'src/assets/bg-img-3.jpg', 
+                dashboardData: null,
                 user_id : null,
                 role: null,
                 blocked: true,   
+                loading: true,
                 doughnutChartData: {
                     labels: ['Python', 'Js', 'HTML', 'Others'],  
                     datasets: [
@@ -172,81 +190,9 @@
                     },
                     cutout: '60%', 
                 },
-                lineChartData: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-                    datasets: [
-                        {
-                            label: 'Commits',
-                            data: [10, 20, 30, 25, 15, 35],
-                            borderColor: '#007BFF',
-                            backgroundColor: 'rgba(76, 175, 80, 0)',
-                            fill: true,
-                            tension: 0.4,
-                        },
-                        {
-                            label: 'Reports Uploaded',
-                            data: [5, 10, 15, 20, 25, 30],
-                            borderColor: '#343A40',
-                            backgroundColor: 'rgba(33, 150, 243, 0)',
-                            fill: true,
-                            tension: 0.4,
-                        },
-                    ],
-                },
-                lineChartOptions: {
-                    responsive: true, 
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Months',
-                            },
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Numbers',
-                            },
-                            beginAtZero: true,
-                        },
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                        },
-                    },
-                },
             };
         },
         computed: {
-            bgStyle1() {
-                return {
-                    height: '47%',
-                    backgroundImage: `url(${this.imageUrl})`,
-                    backgroundSize: 'cover',  
-                    backgroundPosition: 'center'
-                };
-            },
-            bgStyle2() {
-                return {
-                    height: '47%',
-                    backgroundImage: `url(${this.imageUrl2})`,
-                    backgroundSize: 'cover',  
-                    backgroundPosition: 'center'
-                };
-            },
-            bgStyle3() {
-                return {
-                    height: '47%',
-                    backgroundImage: `url(${this.imageUrl3})`,
-                    backgroundSize: 'cover',  
-                    backgroundPosition: 'center'
-                };
-            },
             isLoggedIn() { 
                 this.user_id = localStorage.getItem('user_id');
                 return !!localStorage.getItem('user_id');
@@ -259,6 +205,21 @@
                 localStorage.removeItem('role');  
                 this.$router.push('/login');  
             },
+            async fetchDashboard() {
+                try {
+                    const response = await getSupportDashboard(this.user_id);
+                    this.dashboardData = response;  
+                    this.doughnutChartData.labels = response.metric.labels;  
+                    this.doughnutChartData.datasets = response.metric.datasets;  
+                    console.log(response)
+                    console.log(this.lineChartData)
+                } catch (error) {
+                    this.error = "Failed to fetch dashboard data. Please try again later.";
+                    console.error("API error:", error);
+                } finally {
+                    this.loading = false;  
+                }
+            }, 
         },
         mounted() { 
             const storedUserId = localStorage.getItem('user_id');
@@ -268,8 +229,7 @@
                 this.user_id = storedUserId;
                 this.role = storedRole;
 
-                // if (this.role !== 'support') { 
-                if (this.role !== 'student') { 
+                if (this.role !== 'support') {  
                     Swal.fire({
                         title: 'Access Denied',
                         text: "You don't have access to this page!",
@@ -288,6 +248,8 @@
             } else { 
                 this.$router.push('/login');
             }
+
+            this.fetchDashboard();
 
         },
     };

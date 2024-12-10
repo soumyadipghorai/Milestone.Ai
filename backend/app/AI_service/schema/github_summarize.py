@@ -26,3 +26,4 @@ class CodeAnalyzerInput(BaseModel) :
     user_id: str = Field(..., description="User id of the student")
     repo_name: str = Field(..., description="Reposatory name of the student")
     branch_name: str = Field(..., description="Branch name of the selected repo") 
+    checklist_id: int = Field(..., description="Checklist ID corresponding to the code")  

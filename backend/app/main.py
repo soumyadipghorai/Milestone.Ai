@@ -43,6 +43,8 @@ from AI_service.api.best_practices import router as coding_best_practices_router
 from app_service.api.auth_api import router as authentication_router  
 from app_service.api.student_dashboard import router as student_dahboard_router   
 from app_service.api.instructor_dashboard import router as instructor_dashboard_router
+from app_service.api.admin_dashboard import router as admin_dashboard_router
+from app_service.api.support_dashboard import router as support_dashboard_router
 
 app.include_router(create_milestone_router)
 app.include_router(pdf_analyzer_router)
@@ -51,6 +53,8 @@ app.include_router(coding_best_practices_router)
 app.include_router(authentication_router)
 app.include_router(student_dahboard_router)
 app.include_router(instructor_dashboard_router)
+app.include_router(admin_dashboard_router)
+app.include_router(support_dashboard_router)
 
 if __name__ == "__main__" : 
     uvicorn.run("main:app", host = "0.0.0.0", reload=True)

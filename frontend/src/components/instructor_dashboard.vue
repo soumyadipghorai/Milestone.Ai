@@ -10,7 +10,7 @@
                     <div class="collapse navbar-collapse text-center justify-content-end" id="toggleCollapse">
                         <ul class="navbar-nav d-flex align-items-center">
                             <li class="h-100 nav-link"> 
-                                <router-link :to="isLoggedIn ? `/student-dashboard/${user_id}` : '/login'" class="text-decoration-none selected-role text-primary">
+                                <router-link :to="isLoggedIn ? `/instructor-dashboard/${user_id}` : '/login'" class="text-decoration-none selected-role text-primary">
                                     Dashboard
                                 </router-link>
                             </li> 
@@ -43,7 +43,8 @@
                 </div>
             </nav>
             <div class="loading vh-100 d-flex justify-content-center align-items-center" v-if="loading">
-                <dotlottie-player src="https://lottie.host/60c22126-f9b3-4a76-881a-177db0874030/dvfbPo4NAa.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
+                <!-- <dotlottie-player src="https://lottie.host/60c22126-f9b3-4a76-881a-177db0874030/dvfbPo4NAa.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player> -->
+                loading...
             </div>
             <div class="done" v-else>
                 <div class="dashboard-body my-4" :class="{ blurred: blocked }" v-if="dashboardData.status.registered">
@@ -52,208 +53,58 @@
                             <div class="card p-4" :style="{backgroundColor : 'var(--primary-dark-color)', height: '50vh'}">
                                 <h4 class="lh-2 my-2 text-light">Leader Board</h4>
                                 <div class="leader-board-item overflow-auto">
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
+                                    <div 
+                                        class="row m-0" 
+                                        :style="{borderBottom : '1px dotted var(--primary-background-color)'}" 
+                                        v-for="(studentDetails, studentDetailsIndex) in dashboardData.status.leader_board"
+                                        :key="'leaderboard-details-'+ studentDetailsIndex"
+                                    >
                                         <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
                                             <img src="@/assets/pfp4.png" alt="" width="40">
                                         </div>
                                         <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Aniket 
+                                            {{studentDetails.name}} 
                                         </div>
                                         <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            160 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp1.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Soumyadip Ghorai
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            150 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp2.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Aditya Aman
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            100 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp3.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Mohak
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            0 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp3.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Mohak
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            0 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp3.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Mohak
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            0 commits 
+                                            {{ studentDetails.max_commit }} commits 
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="card  p-4"  :style="{height: '50vh'}">
+                            <div class="card p-4" :style="{height: '50vh'}">
                                 <h4 class="lh-2 my-2 p-2">Student details</h4>
                                 <div class="student-info overflow-auto">
-                                    <div class="row my-2">
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-danger rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
+                                    <div
+                                        v-for="(row, rowIndex) in formattedEnrolledStudentList"
+                                        :key="'row-' + rowIndex"
+                                        class="row my-2"
+                                    >
+                                        <div
+                                            v-for="(item, colIndex) in row"
+                                            :key="'col-' + colIndex"
+                                            class="col-lg-6"
+                                        >
+                                        <div
+                                            class="card p-0"
+                                            :style="{ backgroundColor: 'var(--primary-background-color)' }"
+                                            style="cursor: pointer"
+                                            @click="navigateToProject(item.project_id, item.id)"
+                                        >
+                                        <div class="row m-0">
+                                            <div class="col-2 my-2 d-flex justify-content-start align-items-center">
+                                            <img src="@/assets/pfp2.png" alt="" width="30" />
                                             </div>
+                                            <div class="col-7 my-2 d-flex justify-content-start align-items-center">
+                                            {{ item.name }}
+                                            </div> 
                                         </div>
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-success rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row my-2">
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-warning rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-success rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                    <div class="row my-2">
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-warning rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-success rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row my-2">
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-warning rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card p-0" :style="{backgroundColor: 'var(--primary-background-color)'}">
-                                                <div class="row m-0">
-                                                    <div class="col-2 my-2 d-flex justify-content-start align-items-center">
-                                                        <img src="@/assets/pfp2.png" alt="" width="30">
-                                                    </div>
-                                                    <div class="col-7 my-2 d-flex justify-content-start align-items-center">
-                                                        Soumyadip
-                                                    </div>
-                                                    <div class="col-2 my-2 text-light d-flex justify-content-center align-items-center bg-success rounded-circle">
-                                                        3
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
+                                </div> 
                             </div>
                         </div>
                     </div>
@@ -278,63 +129,17 @@
                                     </div>
                                 </div>
                                 <div class="student-progress-bar overflow-auto px-2">
-                                    <div class="row my-3">
+                                    <div 
+                                        class="row my-3" 
+                                        v-for="(studentDetails, studentDetailsIndex) in dashboardData.status.student_progress"
+                                        :key = "'student-progress-'+studentDetailsIndex"
+                                    >
                                         <div class="col-1 d-flex justify-content-center">
                                             <img src="@/assets/pfp2.png" alt="" width="30">
                                         </div>
                                         <div class="col-11">
-                                            <div class="progress my-2" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 10%"></div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                    <div class="row my-3">
-                                        <div class="col-1 d-flex justify-content-center">
-                                            <img src="@/assets/pfp2.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-11">
-                                            <div class="progress my-2" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar progress-bar-striped" style="width: 10%"></div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                    <div class="row my-3">
-                                        <div class="col-1 d-flex justify-content-center">
-                                            <img src="@/assets/pfp2.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-11">
-                                            <div class="progress my-2" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar progress-bar-striped" style="width: 10%"></div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                    <div class="row my-3">
-                                        <div class="col-1 d-flex justify-content-center">
-                                            <img src="@/assets/pfp2.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-11">
-                                            <div class="progress my-2" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar progress-bar-striped" style="width: 10%"></div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                    <div class="row my-3">
-                                        <div class="col-1 d-flex justify-content-center">
-                                            <img src="@/assets/pfp2.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-11">
-                                            <div class="progress my-2" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar progress-bar-striped" style="width: 10%"></div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                    <div class="row my-3">
-                                        <div class="col-1 d-flex justify-content-center">
-                                            <img src="@/assets/pfp2.png" alt="" width="30">
-                                        </div>
-                                        <div class="col-11">
-                                            <div class="progress my-2" role="progressbar" aria-label="Default striped example" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
-                                                <div class="progress-bar progress-bar-striped" style="width: 10%"></div>
+                                            <div class="progress my-2" role="progressbar" aria-label="Default striped example" :aria-valuenow="studentDetails.percentage" aria-valuemin="0" aria-valuemax="100">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" :style="{width: `${studentDetails.percentage}%`}"></div>
                                             </div> 
                                         </div>
                                     </div>
@@ -342,22 +147,28 @@
                             </div>
                         </div>
                         <div class="col-lg-5">
-                            <div class="card p-4 h-100 text-light bg-primary-subtle text-dark" :style="bgStyle1">
+                            <div class="card p-4 h-100 text-light bg-primary-subtle text-dark">
                                 <h4 class="lh-2 my-2">Status Updates</h4>
-                                <div id="carouselExampleIndicators" class="carousel slide h-100">
-                                    <div class="carousel-indicators">
-                                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button> 
-                                    </div>
-                                    <div class="carousel-inner h-100">
-                                        <div class="carousel-item mx-2 bg-dark active card p-4 h-100 text-light">
-                                            <div class="text-section mx-4">
+                                <div id="carouselExample" class="carousel slide">
+                                    <div class="carousel-inner">
+                                        <div 
+                                            class="carousel-item mx-2 bg-dark card p-4 text-light" 
+                                            v-for="(feedback, feedbackIndex) in dashboardData.status.all_feedback"
+                                            :key="'feedback-' + feedbackIndex"
+                                            :class="{'active': feedbackIndex === currentSlideIndex}"
+                                        >
+                                            <div class="text-section mx-4"> 
                                                 <div class="tag row mb-4 mt-2">
-                                                    <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--in-progress-bg-color)'}">Feedback</div>
-                                                    <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--done-bg-color)'}">Bugs</div> 
+                                                    <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" 
+                                                        :style="{backgroundColor : 'var(--in-progress-bg-color)'}">
+                                                        {{feedback.tag}}
+                                                    </div> 
                                                 </div>
-                                                <h5 class="lh-2 my-2">Please Extend the deadlines for 10 days...</h5>
-                                                <p class="text-secondary mb-4">20.08.2024</p>
+                                                <h5 class="lh-2 my-2">
+                                                    {{ feedback.feedback.length > 100 ? feedback.feedback.slice(0, 100) + '...' : feedback.feedback }}
+                                                </h5> 
+                                                <p class="text-secondary mb-4">{{ feedback.feedback_date }}</p>
+                                                
                                                 <div class="row m-0">
                                                     <div class="col-6 p-0 d-flex justify-content-start">
                                                         <div class="like m-0 w-100">
@@ -365,7 +176,7 @@
                                                                 <img src="@/assets/like.png" alt="" width="20">
                                                             </div>
                                                             <div class="col-10">
-                                                                <b>8+</b> students
+                                                                <b>{{ feedback.like_count }}</b> students
                                                             </div>
                                                         </div>
                                                     </div>
@@ -375,51 +186,19 @@
                                                                 <img src="@/assets/comment.png" alt="" width="20">
                                                             </div>
                                                             <div class="col-10">
-                                                                <b>7+</b> students
+                                                                <b> {{ feedback.comment_count }}</b> students
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="carousel-item bg-dark active card p-4 h-100 text-light">
-                                            <div class="text-section mx-4">
-                                                <div class="tag row mb-4 mt-2">
-                                                    <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--in-progress-bg-color)'}">Feedback</div>
-                                                    <div class="col-4 p-2 rounded-2 mx-2 d-flex align-items-center" :style="{backgroundColor : 'var(--done-bg-color)'}">Bugs</div> 
-                                                </div>
-                                                <h5 class="lh-2 my-2">Please Extend the deadlines for 10 days...</h5>
-                                                <p class="text-secondary mb-4">20.08.2024</p>
-                                                <div class="row m-0">
-                                                    <div class="col-6 p-0 d-flex justify-content-start">
-                                                        <div class="like m-0 w-100">
-                                                            <div class="col-2 p-0">
-                                                                <img src="@/assets/like.png" alt="" width="20">
-                                                            </div>
-                                                            <div class="col-10">
-                                                                <b>8+</b> students
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6 p-0 d-flex justify-content-end">
-                                                        <div class="like m-0 w-100">
-                                                            <div class="col-2 p-0">
-                                                                <img src="@/assets/comment.png" alt="" width="20">
-                                                            </div>
-                                                            <div class="col-10">
-                                                                <b>7+</b> students
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> 
                                     </div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev" @click="goToPrevSlide">
                                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Previous</span>
                                     </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next" @click="goToNextSlide">
                                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                         <span class="visually-hidden">Next</span>
                                     </button>
@@ -460,7 +239,7 @@
 
 <script>   
     import Swal from 'sweetalert2'; 
-     import {getInstructorDashboard, projectEnroll} from '@/services/appService';
+    import {getInstructorDashboard, projectEnroll} from '@/services/appService';
     export default { 
         // name: 'Home',
         data() {
@@ -470,7 +249,8 @@
                 blocked: true, 
                 selectedOption: "dashboard",     
                 dashboardData: null,  
-                loading: true
+                loading: true,  
+                currentSlideIndex: 0,
             };
         },
         computed: { 
@@ -478,6 +258,20 @@
                 this.user_id = localStorage.getItem('user_id');
                 return !!localStorage.getItem('user_id');
             },
+            formattedEnrolledStudentList() {
+                const { enrolled_student_list } = this.dashboardData.status;
+                const rows = [];
+                for (let i = 0; i < enrolled_student_list.length; i += 2) {
+                    rows.push(enrolled_student_list.slice(i, i + 2));
+                }
+                return rows;
+            },
+            itemClass(projectId) {
+                return projectId.includes("fcbc")
+                ? "bg-warning rounded-circle"
+                : "bg-success rounded-circle";
+            },
+
         } ,
         methods: {
             logout() {
@@ -512,13 +306,31 @@
                         project_id: projectId
                     }); 
                     this.dashboardData.status.registered = true;
+                    this.$router.push(`/instructor-dashboard/${projectId}`);
                 } catch (error) {
                     this.error = "Failed to fetch dashboard data. Please try again later.";
                     console.error("API error:", error);
                 } finally {
                     this.loading = false;  
                 }
-            }
+            }, 
+            navigateToProject(projectId, id) {
+                this.$router.push(`/project/${projectId}/${id}`);
+            },
+            goToPrevSlide() {
+                if (this.currentSlideIndex > 0) {
+                    this.currentSlideIndex--;
+                } else {
+                    this.currentSlideIndex = this.dashboardData.status.all_feedback.length - 1;
+                }
+            },  
+            goToNextSlide() {
+                if (this.currentSlideIndex < this.dashboardData.status.all_feedback.length - 1) {
+                    this.currentSlideIndex++;
+                } else {
+                    this.currentSlideIndex = 0;
+                }
+            },
         },
         mounted() { 
             const storedUserId = localStorage.getItem('user_id');
@@ -550,7 +362,7 @@
                 this.$router.push('/login');
             }
 
-            this.fetchDashboard();
+            this.fetchDashboard(); 
         },
     };
 </script>

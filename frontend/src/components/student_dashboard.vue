@@ -49,64 +49,37 @@
             </nav>
             
             <div class="loading vh-100 d-flex justify-content-center align-items-center" v-if="loading">
-                <dotlottie-player src="https://lottie.host/60c22126-f9b3-4a76-881a-177db0874030/dvfbPo4NAa.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
+                <!-- <dotlottie-player src="https://lottie.host/60c22126-f9b3-4a76-881a-177db0874030/dvfbPo4NAa.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player> -->
+                Loading...
             </div>
             <div class="done" v-else>
                 <div class="dashboard-body my-4" :class="{ blurred: blocked }" v-if="dashboardData.status.registered">
                     <div class="row mx-0 my-4">
-                        <div class="col-lg-6">
-                            <div class="card p-4 h-100" :style="{backgroundColor : 'var(--primary-dark-color)'}">
+                        <div class="col-lg-6 py-4">
+                            <div class="card p-4" :style="{backgroundColor : 'var(--primary-dark-color)', height: '59vh'}">
                                 <h4 class="lh-2 my-2 text-light">Leader Board</h4>
-                                <div class="leader-board-item">
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
+                                <div class="leader-board-item overflow-auto">
+                                    <div 
+                                        class="row m-0" 
+                                        :style="{borderBottom : '1px dotted var(--primary-background-color)'}" 
+                                        v-for="(studentDetails, studentDetailsIndex) in dashboardData.status.leader_board"
+                                        :key="'leaderboard-details-'+ studentDetailsIndex"
+                                    >
                                         <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
                                             <img src="@/assets/pfp4.png" alt="" width="40">
                                         </div>
                                         <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Aniket 
+                                            {{studentDetails.name}} 
                                         </div>
                                         <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            160 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp1.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Soumyadip Ghorai
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            150 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp2.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Aditya Aman
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            100 commits 
-                                        </div>
-                                    </div>
-                                    <div class="row m-0" :style="{borderBottom : '1px dotted var(--primary-background-color)'}">
-                                        <div class="col-3 h-100 my-2 d-flex justify-content-start align-items-center">
-                                            <img src="@/assets/pfp3.png" alt="" width="40">
-                                        </div>
-                                        <div class="col-6 d-flex justify-content-start text-light align-items-center">
-                                            Mohak
-                                        </div>
-                                        <div class="col-3 d-flex justify-content-start text-light align-items-center">
-                                            0 commits 
+                                            {{ studentDetails.max_commit }} commits 
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
-                            <div class="card mx-2 p-4">
+                        <div class="col-lg-3 py-4">
+                            <div class="card p-4">
                                 <h4 class="lh-2 my-2">Language Coverage</h4>
                                 <p class="lh-1">Showing for  project-1</p>
                                 <div class="fit-content">
@@ -114,30 +87,30 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 py-4">
                             <div class="card mb-3 p-4 text-light text-end d-flex justify-content-center bg-danger" :style="{height: '47.5%'}">
                                 <div class="metric-container">
                                     <h2 class="lh-2">Total Reports</h2>
-                                    <p class="lh-1">26 pdfs</p>
+                                    <p class="lh-1">{{ dashboardData.status.metric.pdf_count }} pdfs</p>
                                 </div>
                             </div>
                             <div class="card mb-3 p-4 text-light text-end d-flex justify-content-center bg-warning" :style="{height: '47.5%'}">
                                 <div class="metric-container">
                                     <h2 class="lh-2">Total Commits</h2>
-                                    <p class="lh-1">35 commits</p>
+                                    <p class="lh-1">{{ dashboardData.status.metric.code_count }} commits</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row mx-0 my-2">
-                        <div class="col-lg-7">
+                        <div class="col-lg-7 py-4">
                             <div class="card p-4">
                                 <div class="row m-0">
                                     <div class="col-6 d-flex align-items-start">
                                         <h4 class="lh-2 mx-4">Project Tracker</h4>
                                     </div>
                                     <div class="col-6">
-                                        <div class="drop-down-container d-flex justify-content-end align-items-center">
+                                        <!-- <div class="drop-down-container d-flex justify-content-end align-items-center">
                                             <div class="dropdown">
                                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Semester
@@ -147,27 +120,27 @@
                                                     <li><a class="dropdown-item" href="#">Semester 2</a></li>
                                                     <li><a class="dropdown-item" href="#">Semester 3</a></li>
                                                 </ul>
-                                            </div>
-    
-                                        </div>
+                                            </div> 
+                                        </div> -->
                                         <div class="updated-container d-flex justify-content-end align-items-center mt-2">
-                                            <p class="text-secondary">Last updated <span>26 mins ago</span></p>
+                                            <p class="text-secondary fw-light fs-6">All results updated </p>
                                         </div>
                                     </div>
                                 </div>
-                                <Line :data="lineChartData" :options="lineChartOptions" />
+                                <!-- <Line :data="lineChartData" :options="lineChartOptions" /> -->
+                                <Bar :data="barChartData" :options="barChartOptions" />
                             </div>
                         </div>
-                        <div class="col-lg-5">
+                        <div class="col-lg-5 py-4">
                             <div class="card p-4 h-100 bg-dark-subtle">
                                 <h4 class="lh-2 my-2">Give Feedback</h4>
                                 <p class="lh-2 text-secondary">What do you think about current your project and instructor?</p>
-                                <form action="">
+                                <form @submit.prevent="submitFeedback">
                                     <div class="mb-3"> 
-                                        <textarea class="form-control text-secondary form-text-area border-secondary" id="exampleFormControlTextarea1" placeholder="Type your comment..." rows="5" :style="{backgroundColor: 'transparent'}"></textarea>
+                                        <textarea class="form-control text-secondary form-text-area border-secondary" id="exampleFormControlTextarea1" placeholder="Type your comment..." rows="5" :style="{backgroundColor: 'transparent'}" v-model="studentFeedback"></textarea>
                                     </div>
                                     <div class="form-check my-2">
-                                        <input class="form-check-input border-secondary" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}">
+                                        <input class="form-check-input border-secondary" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}" required>
                                         <label class="form-check-label text-secondary" for="flexCheckDefault">
                                             It will be sent to the admin for evaluation
                                         </label>
@@ -208,24 +181,24 @@
 </template>
 
 <script> 
-    import { Line, Doughnut } from 'vue-chartjs';
+    import { Line, Doughnut, Bar } from 'vue-chartjs';
     import Swal from 'sweetalert2'; 
-    import {getStudentDashboard, projectEnroll} from '@/services/appService'
+    import {getStudentDashboard, projectEnroll, submitStudentFeedback} from '@/services/appService'
     import {
-        Chart as ChartJS, Title, Tooltip, Legend, LineElement, 
+        Chart as ChartJS, Title, Tooltip, Legend, LineElement, BarElement, 
         ArcElement, CategoryScale, LinearScale, Filler, PointElement,
     } from 'chart.js';
 
     // Register required Chart.js components
     ChartJS.register( 
         Title, Tooltip, Legend, LineElement, ArcElement, 
-        CategoryScale, LinearScale, Filler, PointElement
+        CategoryScale, LinearScale, Filler, PointElement, BarElement
     );
  
     export default { 
         // name: 'DonutChart',
         components: {
-            Doughnut, Line
+            Doughnut, Line, Bar
         },
         data() {
             return { 
@@ -235,17 +208,18 @@
                 dashboardData: null,
                 loading: true,
                 projectID: null,
+                studentFeedback: null, 
                 selectedOption: "dashboard",                 
                 doughnutChartData: {
                     labels: ['Python', 'Js', 'HTML', 'Others'],  
                     datasets: [
-                    {
-                        label: 'Language Used',
-                        data: [300, 50, 100, 75],   
-                        backgroundColor: ['#007BFF', 'rgba(0, 123, 255, 0.8)', 'rgba(0, 123, 255, 0.65)', 'rgba(0, 123, 255, 0.25)'],
-                        borderColor: '#ffffff',  
-                        borderWidth: 2,
-                    },
+                        {
+                            label: 'Language Used',
+                            data: [300, 50, 100, 75],   
+                            backgroundColor: ['rgba(0, 123, 255, 1.0)', 'rgba(0, 123, 255, 0.8)', 'rgba(0, 123, 255, 0.65)', 'rgba(0, 123, 255, 0.25)'],
+                            borderColor: '#ffffff',  
+                            borderWidth: 2,
+                        },
                     ],
                 },
                 doughnutChartOptions: {
@@ -257,29 +231,27 @@
                     },
                     cutout: '60%', 
                 },
-                lineChartData: {
+                barChartData: {
                     labels: ['January', 'February', 'March', 'April', 'May', 'June'],
                     datasets: [
                         {
                             label: 'Commits',
                             data: [10, 20, 30, 25, 15, 35],
+                            backgroundColor: 'rgba(0, 123, 255, 0.5)',  
                             borderColor: '#007BFF',
-                            backgroundColor: 'rgba(76, 175, 80, 0)',
-                            fill: true,
-                            tension: 0.4,
+                            borderWidth: 1,
                         },
                         {
                             label: 'Reports Uploaded',
                             data: [5, 10, 15, 20, 25, 30],
+                            backgroundColor: 'rgba(52, 58, 64, 0.5)',  
                             borderColor: '#343A40',
-                            backgroundColor: 'rgba(33, 150, 243, 0)',
-                            fill: true,
-                            tension: 0.4,
+                            borderWidth: 1,
                         },
                     ],
                 },
-                lineChartOptions: {
-                    responsive: true, 
+                barChartOptions: {
+                    responsive: true,
                     scales: {
                         x: {
                             title: {
@@ -287,8 +259,8 @@
                                 text: 'Months',
                             },
                             grid: {
-                                display: false
-                            }
+                                display: false,
+                            },
                         },
                         y: {
                             title: {
@@ -325,14 +297,31 @@
             },
             async fetchDashboard() {
                 try {
+                    console.log(this.barChartData);
                     const response = await getStudentDashboard(this.user_id);
                     this.dashboardData = response;  
                     this.projectID = response.status.project_id; 
+                    this.doughnutChartData = response.status.language_details;
+                    this.barChartData = response.status.progress_chart;
+                    console.log(this.barChartData)
                 } catch (error) {
                     this.error = "Failed to fetch dashboard data. Please try again later.";
                     console.error("API error:", error);
                 } finally {
                     this.loading = false;  
+                }
+            }, 
+            async submitFeedback() { 
+                try {
+                    const response = await submitStudentFeedback({
+                        user_id: this.user_id, 
+                        feedback: this.studentFeedback
+                    });
+                    this.studentFeedback = null;
+                    alert("feedback submitted!");
+                } catch (error) {
+                    this.error = "Failed to fetch dashboard data. Please try again later.";
+                    console.error("API error:", error);
                 }
             }, 
             async enrollInProject(projectId) {

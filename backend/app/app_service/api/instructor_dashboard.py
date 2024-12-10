@@ -36,21 +36,6 @@ def get_project_details(project_id: str) :
     obj = FetchProjectReport(project_id = project_id)
     return obj.fetch()
 
-@router.get("/get-enrolled-students")
-def get_enrolled_studentsd(user_id: str, db: Session = Depends(get_db)) : 
-    user = db.query(Instructor).filter(Instructor.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Project not found")
-
-    output = []
-    all_students = db.query(Project).filter(Project.id == user.project_id).first().students
-    for student in all_students : 
-        output.append({
-            "id" : student.id, "name" : student.name, "project_id" : student.project_id
-        })
-
-    return output
-
 @router.put("/update-project")
 def update_project(project_details: ProjectUpdate, db: Session = Depends(get_db)):
     project = db.query(Project).filter(Project.id == project_details.id).first()

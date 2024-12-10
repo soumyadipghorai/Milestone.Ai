@@ -15,8 +15,10 @@ async def analyze_code(user_details: CodeAnalyzerInput, db: Session = Depends(ge
     
     analyzer_obj = CodeAnalyzer(
         username= existing_student.github_username, repo_name= user_details.repo_name, 
-        branch_name = user_details.branch_name
+        branch_name = user_details.branch_name, checklist_id= user_details.checklist_id, 
+        student_id= user_details.user_id
     )
+    
     output = analyzer_obj.analyze()
     return output 
 

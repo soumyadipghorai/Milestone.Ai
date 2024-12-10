@@ -49,3 +49,6 @@ ROLE_MAPPING = {
     "student" : Student, "admin" : Admin, "instructor" : Instructor, 
     "support" : SupportTeam
 }
+
+INFO_LOG_FILE_PATH = 'log/info.log'
+DEBUG_LOG_FILE_PATH = 'log/debug.log'

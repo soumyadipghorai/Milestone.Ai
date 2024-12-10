@@ -232,7 +232,7 @@
             }, 
             saveProjectDetails() {
                 const updatedProjectDetails = this.projectDetails;  
-                console.log("Updated Project Details:", updatedProjectDetails);
+                console.log("Updated Project Details:", JSON.stringify(updatedProjectDetails));
 
                 // updatedProjectDetails.milestones.forEach((milestone) => {
                 //     console.log("Milestone:", milestone);

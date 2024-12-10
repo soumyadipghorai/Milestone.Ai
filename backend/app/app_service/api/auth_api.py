@@ -7,6 +7,7 @@ from utils.auth_utils import *
 from utils.db_operations import * 
 from fastapi.security import OAuth2PasswordRequestForm
 from uuid import uuid4
+from datetime import datetime
 from _temp.config import ROLE_MAPPING
  
 router = APIRouter(prefix="/v1", tags=["Registers an admin into the database"])
@@ -21,12 +22,13 @@ def register_admin(user: UserRegistration, db: Session = Depends(get_db)):
     if user.role == "student" :
         new_user = Table( 
             id = str(uuid4()), name = user.name, email = user.email, 
-            github_username = user.github_username, password = hash_password(user.password),
+            github_username = user.github_username, password = hash_password(user.password), 
+            enrollment_date = datetime.now()
         )
     else : 
         new_user = Table( 
             id = str(uuid4()), name = user.name, email = user.email,
-            password = hash_password(user.password)
+            password = hash_password(user.password), enrollment_date = datetime.now()
         )
     
     return add_entry(entry = new_user, success_key="id", success_value= new_user.id)

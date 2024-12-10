@@ -16,9 +16,45 @@ export async function projectReportUpload(file) {
     }
 }
 
+export async function studentReportUpload(formData) {
+    try { 
+        const response = await apiClient.post("/analyze-student-report", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data", 
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+}
+
+
 export async function getInstructorDashboard(user_id) {
     try { 
         const response = await apiClient.get("/get-instructor-dashboard", {
+            params: { user_id },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export async function getSupportDashboard(user_id) {
+    try { 
+        const response = await apiClient.get("/get-support-dashboard", {
+            params: { user_id },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export async function getAdminDashboard(user_id) {
+    try { 
+        const response = await apiClient.get("/get-admin-dashboard", {
             params: { user_id },
         });
         return response.data;
@@ -42,6 +78,17 @@ export async function getProjectDetails(project_id) {
     try { 
         const response = await apiClient.get("/get-project-details", {
             params: { project_id },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export async function getStudentProjectDetails(user_id) {
+    try { 
+        const response = await apiClient.get("/get-student-project-details", {
+            params: { user_id },
         });
         return response.data;
     } catch (error) {
@@ -74,6 +121,15 @@ export async function getAllBranches(user_id, repo_name) {
 export async function analyzeCode(data) {
     try { 
         const response = await apiClient.post("/analyze-code", data);
+        return response.data;
+    } catch (error) {
+        throw error.response.data;
+    }
+}
+
+export async function submitStudentFeedback(data) {
+    try { 
+        const response = await apiClient.post("/submit-feedback", data);
         return response.data;
     } catch (error) {
         throw error.response.data;

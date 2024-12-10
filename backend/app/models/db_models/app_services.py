@@ -17,14 +17,13 @@ class LanguageGuidelines(Base):
     name = Column(String)
     guideline = Column(JSON) 
 
-# admin --> project --> instructor --> Student
-
 class Admin(Base):
     __tablename__ = "admin"
     id = Column(String, primary_key=True, nullable = False)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False) 
+    enrollment_date = Column(DateTime, nullable= False)
 
     # projects = relationship("Project", back_populates="admin")
 
@@ -35,11 +34,13 @@ class Project(Base):
     description = Column(String, nullable=False)
     file_path = Column(String, nullable = False)
     deadline = Column(Date, nullable = False)
+    creation_date = Column(DateTime, nullable= False)
     # admin_id = Column(String, ForeignKey("admin.id"), nullable=False)
 
     # admin = relationship("Admin", back_populates="projects")
     students = relationship("Student", back_populates="project")
     milestones = relationship("Milestone", back_populates="project")
+    feedback = relationship("StudentSupport", back_populates="project_details")
     # chatbots = relationship("Chatbot", back_populates="project")
 
 class Instructor(Base):
@@ -48,6 +49,7 @@ class Instructor(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    enrollment_date = Column(DateTime, nullable= False)
     project_id = Column(String, ForeignKey("projects.id"), nullable = True) 
 
 class Student(Base):
@@ -58,6 +60,7 @@ class Student(Base):
     github_username = Column(String, nullable=True)
     password = Column(String, nullable=False)
     project_id = Column(String, ForeignKey("projects.id"), nullable = True) 
+    enrollment_date = Column(DateTime, nullable= False)
     # dashboard_id = Column(String, ForeignKey("projects.id"), nullable = True)  
     # chat = Column(String, ForeignKey("projects.id"))  
 
@@ -99,16 +102,13 @@ class PDF(Base):
     __tablename__ = "pdfs"
     id = Column(Integer, primary_key=True, autoincrement=True)
     file_path = Column(String, nullable=False)
-    file_summary = Column(String, nullable=True)
-    key_insights = Column(String, nullable = True)
-    tags = Column(String, nullable = True)
-    conclusion = Column(String, nullable= True)
-    recommendation = Column(String, nullable= True)
+    ai_response = Column(JSON, nullable= False)
     instructor_feedback = Column(String, nullable=True)
+    upload_time = Column(DateTime, nullable=False)
     checklist_id = Column(String, ForeignKey("checklists.id"))
+    uploaded_by = Column(String, ForeignKey("students.id"))
     
     checklist = relationship("Checklist", back_populates="pdfs")
-    uploaded_by = Column(String, ForeignKey("students.id"))
     student = relationship("Student", back_populates="uploaded_by")
 
 
@@ -119,7 +119,7 @@ class GitHubAccount(Base):
     total_commit = Column(Integer, nullable = True)
     total_language = Column(JSON, nullable = True)
     repo_name = Column(String, nullable= True)
-    entry_time = Column(Date, nullable= True)
+    entry_time = Column(DateTime, nullable= True)
     student_id = Column(String, ForeignKey('students.id'))
     student = relationship("Student", back_populates="github_profile")
 
@@ -151,6 +151,7 @@ class SupportTeam(Base):
     name = Column(String, nullable=False) 
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    enrollment_date = Column(DateTime, nullable= False)
     
 """
 # class Bug(Base):
@@ -184,11 +185,14 @@ class SupportTeam(Base):
 class CodeQuality(Base):
     __tablename__ = "code_quality"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    code_summary = Column(String, nullable=True)
+    instructor_inputs = Column(String, nullable=True)
     instructor_feedback = Column(String, nullable=True)
     overall_summary = Column(String, nullable= True)
     commit_summary = Column(String, nullable= True)
+    repo_name = Column(String, nullable= True)
+    branch_name = Column(String, nullable= True)
     checklist_id = Column(String, ForeignKey("checklists.id"))
+    upload_time = Column(DateTime, nullable= False) 
     
     checklist = relationship("Checklist", back_populates="code_quality")
     written_by = Column(String, ForeignKey("students.id"))
@@ -212,7 +216,9 @@ class StudentSupport(Base) :
     tag = Column(String, nullable= False)
     feedback_date = Column(Date, nullable= False)
     like_count = Column(Integer, nullable= True)
-    comment_count = Column(String, nullable= True) 
+    comment_count = Column(Integer, nullable= True) 
     feedback_by = Column(String, ForeignKey('students.id'))
+    project_id = Column(String, ForeignKey('projects.id'))
 
     student = relationship("Student", back_populates="student_feedback")
+    project_details = relationship('Project', back_populates="feedback")
