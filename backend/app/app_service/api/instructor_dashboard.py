@@ -8,16 +8,30 @@ from utils.db_operations import *
 from app_service.schema.dahboard import ProjectEnroll, ProjectUpdate
 from _temp.config import ROLE_MAPPING
 from app_service.controllers.fetch_instructor_dashboard import DashboardGenerator, FetchProjectReport
- 
+from datetime import datetime, date
+from sqlalchemy import func
+from utils.web_socket_util import push_notification
 router = APIRouter(prefix="/v1", tags=["instructor dashboard"])
 
 @router.get("/get-instructor-dashboard")
-def get_instructor_dashboard(db: Session = Depends(get_db), user_id: str = "") : 
+async def get_instructor_dashboard(db: Session = Depends(get_db), user_id: str = "") : 
     existing_Instructor = db.query(Instructor).filter(Instructor.id == user_id).first()
     if not existing_Instructor : 
         raise HTTPException(status_code=400, detail="Instructor id is not matching")
     else :
         obj = DashboardGenerator(instructor_id=user_id) 
+        today = date.today()  # Get today's date
+        today_submissions = (
+            db.query(CodeQuality).filter(func.date(CodeQuality.upload_time) == today).order_by(CodeQuality.upload_time.desc())  # Optional: order by upload time.all()
+        )
+        for sub in today_submissions:
+            student=db.query(Student).filter(Student.id==sub.written_by).first()
+            milestone_id=db.query(Checklist).filter(Checklist.id==sub.checklist_id).first().milestone_id
+            milestone_name=db.query(Milestone).filter(Milestone.id==milestone_id).first().name
+            message=f"{student.name} submitted the requirements for milestone:{milestone_name}"
+            notifications=db.query(Notification).filter(Notification.content==message).first()
+            if not notifications:
+                await push_notification(to_role="instructor", message=message, db=db,milestone_id=milestone_id)
         return obj.get_dashboard()
     
 @router.put("/project-enroll")

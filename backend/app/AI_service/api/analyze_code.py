@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from models.db_models import Student
+from models.db_models import *
 from models.database import get_db   
 from AI_service.controllers.github_analyzer import CodeAnalyzer 
 from AI_service.schema.github_summarize import CodeAnalyzerInput

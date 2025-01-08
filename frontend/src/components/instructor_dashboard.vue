@@ -24,9 +24,17 @@
                                     </a>
 
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                    <li v-if="notifications">
+                                        <li v-for="(notification, index) in notifications" :key="index">
+                                        <a class="dropdown-item" href="#" @click="markAsRead(index)">
+                                        {{ notification.message }}
+                                        </a>
+                                        </li>
+                                    </li>
+                                    <li v-else>
+                                        <span class="dropdown-item">No new notifications</span>
+                                    </li>
+                                    
                                     </ul>
                                 </div>
                             </li>
@@ -243,7 +251,8 @@
     export default { 
         // name: 'Home',
         data() {
-            return {                
+            return {   
+                notifications:null,             
                 user_id : null,
                 role: null,
                 blocked: true, 
@@ -286,8 +295,9 @@
             async fetchDashboard() {
                 try {
                     const response = await getInstructorDashboard(this.user_id);
-                    this.dashboardData = response;  
-                    console.log(response)
+                    this.dashboardData = response; 
+                    this.notifications = response.status.notifications; 
+                    console.log(this.dashboardData.status.all_feedback);
                 } catch (error) {
                     this.error = "Failed to fetch dashboard data. Please try again later.";
                     console.error("API error:", error);

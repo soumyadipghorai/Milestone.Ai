@@ -4,6 +4,13 @@ from app_service.controllers.fetch_instructor_dashboard import FetchProjectRepor
 import json
 from sqlalchemy import func
 from datetime import datetime
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
+from utils.web_socket_util import Manager
+from config.logs import logger
+from sqlalchemy.orm import Session
+from models.database import get_db   
+from utils.db_operations import * 
+from fastapi.responses import JSONResponse
 
 class DBOps : 
     def __init__(self) : 
@@ -20,136 +27,111 @@ class DashboardGenerator(DBOps) :
         return all_projects
     
     def __get_language_details(self) : 
-        try :
+        if(self.db.query(GitHubAccount).filter(GitHubAccount.student_id == self.student_id).first()):
             github_details = json.loads(self.db.query(GitHubAccount).filter(GitHubAccount.student_id == self.student_id).first().total_language) 
-            return {
-                "label" : list(github_details.keys()), "datasets" : [
-                    {
-                        "label": "Language Used",
-                        "data": list(github_details.values()) ,
-                        "backgroundColor":  [f'rgba(0, 123, 255, {1.0 - 1/len(github_details.keys())*i})' for i in range(len(github_details.keys()))],
-                        "borderColor": "#ffffff",
-                        "borderWidth": 2,
-                    }
-                ]
-            }
-        except : 
-            return {
-                "label" : ["No codes uploaded"], "datasets" : [
-                    {
-                        "label": "Language Used",
-                        "data": [None] ,
-                        "backgroundColor":  ['rgba(0, 123, 255, 1'],
-                        "borderColor": "#ffffff",
-                        "borderWidth": 2,
-                    }
-                ]
-            }
+            if github_details:
+                return {
+                    "label" : list(github_details.keys()), "datasets" : [
+                        {
+                            "label": "Language Used",
+                            "data": list(github_details.values()) ,
+                            "backgroundColor":  [f'rgba(0, 123, 255, {1.0 - 1/len(github_details.keys())*i})' for i in range(len(github_details.keys()))],
+                            "borderColor": "#ffffff",
+                            "borderWidth": 2,
+                        }
+                    ]
+                }
+        else:
+             return {}
         
     def __get_metric(self) : 
+        
         all_codes = self.db.query(GitHubAccount).filter(GitHubAccount.student_id == self.student_id).all()
-        try :
-            return {
-                "pdf_count" : len(self.db.query(PDF).filter(PDF.uploaded_by == self.student_id).all()),
-                "code_count" : max([code.total_commit for code in all_codes])
-            }  
-        except :
-            return {
-                "pdf_count" : 0,
-                "code_count" : 0
-            }  
+        return {
+            "pdf_count" : len(self.db.query(PDF).filter(PDF.uploaded_by == self.student_id).all()),
+            "code_count" : max([code.total_commit for code in all_codes])
+        }  
     
     def __create_leaderboard(self) :
-        try :
-            all_student, output = self.db.query(Student).all(), []
-            for student in all_student : 
-                if student.project_id == self.project_id : 
-                    all_codes = self.db.query(GitHubAccount).filter(GitHubAccount.student_id == student.id).all()
-                    max_commit = max([code.total_commit for code in all_codes])
+        all_student, output = self.db.query(Student).all(), []
+        for student in all_student : 
+            if student.project_id == self.project_id : 
+                all_codes = self.db.query(GitHubAccount).filter(GitHubAccount.student_id == student.id).all()
+                max_commit = max([code.total_commit for code in all_codes])
 
-                    output.append({
-                        "name" : student.name, "max_commit" : max_commit,
-                        "id" : student.id
-                    })
+                output.append({
+                    "name" : student.name, "max_commit" : max_commit,
+                    "id" : student.id
+                })
 
-            return output
-        except : 
-            return []
+        return output
     
-    def __generate_progress_chart(self) :  
-        try :
-            all_pdf_record = self.db.query(
-                func.strftime('%Y-%m', PDF.upload_time).label('month'),   
-                func.count().label('count')
-            ).group_by(func.strftime('%Y-%m', PDF.upload_time)).order_by('month').all()
+    def __generate_progress_chart(self):
+        all_pdf_record = self.db.query(
+            func.strftime('%Y-%m', PDF.upload_time).label('month'),   
+            func.count().label('count')
+        ).filter(PDF.uploaded_by == self.student_id).group_by(func.strftime('%Y-%m', PDF.upload_time)).order_by('month').all()
 
-            all_code_record = self.db.query(
-                func.strftime('%Y-%m', GitHubAccount.entry_time).label('month'),
-                func.sum(GitHubAccount.total_commit).label('total_value')
-            ).group_by(func.strftime('%Y-%m', GitHubAccount.entry_time)).order_by('month').all()
+        all_code_record = self.db.query(
+            func.strftime('%Y-%m', GitHubAccount.entry_time).label('month'),
+            func.sum(GitHubAccount.total_commit).label('total_value')
+        ).filter(GitHubAccount.student_id==self.student_id).group_by(func.strftime('%Y-%m', GitHubAccount.entry_time)).order_by('month').all()
 
-            all_date = set() 
-            for record in all_pdf_record : 
-                all_date.add(datetime.strptime(record.month, "%Y-%m").date()) 
+        all_date = set() 
+        for record in all_pdf_record : 
+            all_date.add(datetime.strptime(record.month, "%Y-%m").date()) 
 
-            for record in all_code_record : 
-                all_date.add(datetime.strptime(record.month, "%Y-%m").date()) 
+        for record in all_code_record : 
+            all_date.add(datetime.strptime(record.month, "%Y-%m").date()) 
 
-            sorted_date = sorted(list(all_date))
-            label = [date.strftime("%Y-%m") for date in sorted_date]
+        sorted_date = sorted(list(all_date))
+        label = [date.strftime("%Y-%m") for date in sorted_date]
 
-            pointer = 0
-            pdf_count = []
-            for record in all_pdf_record : 
-                if record.month == label[pointer] : 
-                    pdf_count.append(record.count)
-                    pointer += 1 
+        pointer = 0
+        pdf_count = []
+        for record in all_pdf_record : 
+            if record.month == label[pointer] : 
+                pdf_count.append(record.count)
+                pointer += 1 
 
-            pointer = 0
-            commit_count = []
-            for record in all_code_record : 
-                if record.month == label[pointer] : 
-                    commit_count.append(record.total_value)
-                    pointer += 1 
+        pointer = 0
+        commit_count = []
+        for record in all_code_record : 
+            if record.month == label[pointer] : 
+                commit_count.append(record.total_value)
+                pointer += 1 
 
-            return {
-                "labels" : label, "datasets" : [
-                    {
-                        "label": 'Commits',
-                        "data": commit_count,
-                        "backgroundColor": 'rgba(0, 123, 255, 0.5)',
-                        "borderColor": '#007BFF',
-                        "borderWidth": 1,
-                    },
-                    {
-                        "label": 'Reports Uploaded',
-                        "data": pdf_count,
-                        "backgroundColor": 'rgba(52, 58, 64, 0.5)',
-                        "borderColor": '#343A40',
-                        "borderWidth": 1,
-                    }
-                ]
-            }
-        except :
-            return {
-                "labels" : ["None"], "datasets" : [
-                    {
-                        "label": 'Commits',
-                        "data": [None],
-                        "backgroundColor": 'rgba(0, 123, 255, 0.5)',
-                        "borderColor": '#007BFF',
-                        "borderWidth": 1,
-                    },
-                    {
-                        "label": 'Reports Uploaded',
-                        "data": [None],
-                        "backgroundColor": 'rgba(52, 58, 64, 0.5)',
-                        "borderColor": '#343A40',
-                        "borderWidth": 1,
-                    }
-                ]
-            }
-
+        return {
+            "labels" : label, "datasets" : [
+                {
+                    "label": 'Commits',
+                    "data": commit_count,
+                    "backgroundColor": 'rgba(0, 123, 255, 0.5)',
+                    "borderColor": '#007BFF',
+                    "borderWidth": 1,
+                },
+                {
+                    "label": 'Reports Uploaded',
+                    "data": pdf_count,
+                    "backgroundColor": 'rgba(52, 58, 64, 0.5)',
+                    "borderColor": '#343A40',
+                    "borderWidth": 1,
+                }
+            ]
+        }
+    def __get_notifs(self):
+            unsent_notifs = (
+                self.db.query(Notification)
+                .filter(Notification.role == 'student')
+                .order_by(Notification.id.desc())
+                .all()
+            )
+            notifications = []
+            for notif in unsent_notifs:
+                notifications.append({"id": notif.id, "message": notif.content, "status": notif.status})
+                notif.status = "sent"
+            db.commit()
+            return notifications
     def __check_registration(self) : 
         user_details = self.db.query(Student).filter(Student.id == self.student_id).first()
         self.project_id = user_details.project_id 
@@ -158,7 +140,8 @@ class DashboardGenerator(DBOps) :
                 "registered" : True, "project_id" : user_details.project_id, 
                 "language_details" : self.__get_language_details(), 
                 "metric" : self.__get_metric(), "leader_board" : self.__create_leaderboard(),
-                "progress_chart" : self.__generate_progress_chart()
+                "progress_chart" : self.__generate_progress_chart(),
+                "notifications":self.__get_notifs()
             }
         else : 
             return {
@@ -199,9 +182,23 @@ class StudentProjectDetails(FetchProjectReport) :
             })
 
         return output
+    def notifs(self):
+            unsent_notifs = (
+                self.db.query(Notification)
+                .filter(Notification.role == 'student')
+                .order_by(Notification.id.desc())
+                .all()
+            )
+            notifications = []
+            for notif in unsent_notifs:
+                notifications.append({"id": notif.id, "message": notif.content, "status": notif.status})
+                notif.status = "sent"
+            db.commit()
+            return notifications
 
     def get_project_dashboard(self) : 
         return {
             "project_details" : self.fetch(), "uploaded_docs" : self.get_uploaded_docs(), 
-            "code_feedback" : self.fecth_feedback()
+            "code_feedback" : self.fecth_feedback(),
+            "notifications":self.notifs()
         } 

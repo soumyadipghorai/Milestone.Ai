@@ -17,7 +17,7 @@
                             <li class="h-100 nav-link"> 
                                 <router-link :to="isLoggedIn ? `/project/${projectID}/${user_id}` : '/login'" class="text-decoration-none text-reset">
                                     My Project
-                                </router-link>
+                                </router-link>  
                             </li> 
                             <li>
                                 <div class="dropdown h-100 nav-link d-flex align-items-center py-0">
@@ -29,9 +29,17 @@
                                     </a>
 
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                    <li v-if="notifications">
+                                        <li v-for="(notification, index) in notifications" :key="index">
+                                        <a class="dropdown-item" href="#" @click="markAsRead(index)">
+                                        {{ notification.message }}
+                                        </a>
+                                        </li>
+                                    </li>
+                                    <li v-else>
+                                        <span class="dropdown-item">No new notifications</span>
+                                    </li>
+                                    
                                     </ul>
                                 </div>
                             </li>
@@ -55,8 +63,8 @@
             <div class="done" v-else>
                 <div class="dashboard-body my-4" :class="{ blurred: blocked }" v-if="dashboardData.status.registered">
                     <div class="row mx-0 my-4">
-                        <div class="col-lg-6 py-4">
-                            <div class="card p-4" :style="{backgroundColor : 'var(--primary-dark-color)', height: '59vh'}">
+                        <div class="col-lg-6">
+                            <div class="card p-4" :style="{backgroundColor : 'var(--primary-dark-color)', height: '57vh'}">
                                 <h4 class="lh-2 my-2 text-light">Leader Board</h4>
                                 <div class="leader-board-item overflow-auto">
                                     <div 
@@ -78,8 +86,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3 py-4">
-                            <div class="card p-4">
+                        <div class="col-lg-3">
+                            <div class="card mx-2 p-4">
                                 <h4 class="lh-2 my-2">Language Coverage</h4>
                                 <p class="lh-1">Showing for  project-1</p>
                                 <div class="fit-content">
@@ -87,7 +95,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3 py-4">
+                        <div class="col-lg-3">
                             <div class="card mb-3 p-4 text-light text-end d-flex justify-content-center bg-danger" :style="{height: '47.5%'}">
                                 <div class="metric-container">
                                     <h2 class="lh-2">Total Reports</h2>
@@ -103,7 +111,7 @@
                         </div>
                     </div>
                     <div class="row mx-0 my-2">
-                        <div class="col-lg-7 py-4">
+                        <div class="col-lg-7">
                             <div class="card p-4">
                                 <div class="row m-0">
                                     <div class="col-6 d-flex align-items-start">
@@ -131,7 +139,7 @@
                                 <Bar :data="barChartData" :options="barChartOptions" />
                             </div>
                         </div>
-                        <div class="col-lg-5 py-4">
+                        <div class="col-lg-5">
                             <div class="card p-4 h-100 bg-dark-subtle">
                                 <h4 class="lh-2 my-2">Give Feedback</h4>
                                 <p class="lh-2 text-secondary">What do you think about current your project and instructor?</p>
@@ -202,6 +210,7 @@
         },
         data() {
             return { 
+                notifications:null,
                 user_id : null,
                 role: null,
                 blocked: true, 
@@ -219,6 +228,7 @@
                             backgroundColor: ['rgba(0, 123, 255, 1.0)', 'rgba(0, 123, 255, 0.8)', 'rgba(0, 123, 255, 0.65)', 'rgba(0, 123, 255, 0.25)'],
                             borderColor: '#ffffff',  
                             borderWidth: 2,
+                            
                         },
                     ],
                 },
@@ -226,7 +236,8 @@
                     responsive: true, 
                     plugins: {
                         legend: {
-                            display: false,
+                            display: true,
+                            
                         },
                     },
                     cutout: '60%', 
@@ -296,21 +307,24 @@
                 this.selectedOption = option;  
             },
             async fetchDashboard() {
-                try {
-                    console.log(this.barChartData);
-                    const response = await getStudentDashboard(this.user_id);
-                    this.dashboardData = response;  
-                    this.projectID = response.status.project_id; 
+            try {
+                const response = await getStudentDashboard(this.user_id);
+                if (response && response.status) {
+                    this.dashboardData = response;
+                    this.projectID = response.status.project_id;
                     this.doughnutChartData = response.status.language_details;
                     this.barChartData = response.status.progress_chart;
-                    console.log(this.barChartData)
-                } catch (error) {
-                    this.error = "Failed to fetch dashboard data. Please try again later.";
-                    console.error("API error:", error);
-                } finally {
-                    this.loading = false;  
+                    this.notifications = response.status.notifications;
+                } else {
+                    console.warn("API response did not return expected data structure.");
                 }
-            }, 
+            } catch (error) {
+                console.error("API error:", error);
+                this.error = "Failed to fetch dashboard data. Please try again later.";
+            } finally {
+                this.loading = false; // Ensure loading is always false after the API call
+            }
+        },
             async submitFeedback() { 
                 try {
                     const response = await submitStudentFeedback({
@@ -339,11 +353,27 @@
                 } finally {
                     this.loading = false;  
                 }
-            }
-        },
+            },
+            // async fetchNotifications() {
+            //     try {
+            //         const role="student"
+            //         const response = await fetch(`/v1/get_notifs/${role}`);
+            //         if (!response.ok) {
+            //         throw new Error(`HTTP error! status: ${response.status}`);
+            //         }
+            //         const data = await response.json(); // Parse JSON
+            //         this.notifications = data.messages.slice(0, 3); // Get latest 3 notifications
+            //     } catch (error) {
+            //         console.error("Error fetching notifications:", error);
+            //         this.errorMessage = "Failed to load notifications. Please try again later.";
+            //     }
+            // }
+
+  },
         mounted() { 
             const storedUserId = localStorage.getItem('user_id');
             const storedRole = localStorage.getItem('role');
+            
         
             if (storedUserId && storedRole) {
                 this.user_id = storedUserId;
@@ -371,6 +401,8 @@
             }
 
             this.fetchDashboard(); 
+
+            // this.fetchNotifications();
         },
     };
 </script>

@@ -1,8 +1,8 @@
-from models.db_models import Instructor, Project, Milestone, CodeQuality, StudentSupport, Student, GitHubAccount, Checklist, PDF
+from models.db_models import *
 from models.database import get_db
 from sqlalchemy.orm import joinedload
 from datetime import datetime
-
+from utils.db_operations import * 
 class DBOps : 
     def __init__(self) : 
         self.db = get_db()
@@ -12,7 +12,7 @@ class DashboardGenerator(DBOps) :
         self.instructor_id = instructor_id  
         self.user_details = None
         super().__init__()
-
+    
     def __fetch_available_projects(self) : 
         all_projects = self.db.query(Project).all()
         return all_projects
@@ -30,6 +30,19 @@ class DashboardGenerator(DBOps) :
                 })
 
         return output 
+    def __get_notifs(self):
+            unsent_notifs = (
+                self.db.query(Notification)
+                .filter(Notification.role == 'instructor')
+                .order_by(Notification.id.desc())
+                .all()
+            )
+            notifications = []
+            for notif in unsent_notifs:
+                notifications.append({"id": notif.id, "message": notif.content, "status": notif.status})
+                notif.status = "sent"
+                db.commit()
+            return notifications
     
     def __fetch_all_feedback(self) : 
         all_feedbacks = self.db.query(StudentSupport).filter(StudentSupport.project_id == self.user_details.project_id).all()
@@ -79,6 +92,7 @@ class DashboardGenerator(DBOps) :
 
             
         return output
+    
 
     def __check_registration(self) : 
         self.user_details = self.db.query(Instructor).filter(Instructor.id == self.instructor_id).first()
@@ -88,7 +102,9 @@ class DashboardGenerator(DBOps) :
                 "enrolled_student_list" : self.__get_enrolled_students(), 
                 "all_feedback" : self.__fetch_all_feedback(),
                 "leader_board" : self.__get_leaderboard(), 
-                "student_progress" : self.__get_student_progress()
+                "student_progress" : self.__get_student_progress(),
+                "notifications":self.__get_notifs()
+                
             }
         else : 
             return {"registered" : False, "new_project" : self.__fetch_available_projects()}

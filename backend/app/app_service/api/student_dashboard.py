@@ -7,7 +7,9 @@ from utils.db_operations import *
 from datetime import datetime
 from app_service.controllers.fetch_student_dashboard import DashboardGenerator, StudentProjectDetails
 from app_service.schema.dahboard import Feedback
- 
+from utils.web_socket_util import push_notification
+import asyncio
+from config.logs import logger
 router = APIRouter(prefix="/v1", tags=["student dashboard"])
 
 @router.get("/get-student-dashboard")
@@ -18,7 +20,16 @@ def get_student_dashboard(db: Session = Depends(get_db), user_id: str = "") :
     
     else :
         obj = DashboardGenerator(student_id=user_id) 
-        return obj.get_dashboard()
+        try:
+            notified_milestone_ids=[notif.milestone_id for notif in db.query(Notification).all()]
+            deadline_today_milestones=db.query(Milestone).filter(Milestone.deadline==datetime.now().date(), Milestone.id not in notified_milestone_ids).all()
+            for milestone in deadline_today_milestones:
+                push_notification(to_role="student", message=f"Today is the last date to submit the following milestone: '{milestone.name}'", db=db)
+        except Exception as e:
+            logger.error(f"student_dashboard.py:deadline notification:{str(e)}")
+        finally:    
+           return obj.get_dashboard()
+        
     
 @router.get("/get-student-project-details")
 def get_student_dashboard(user_id: str, db: Session = Depends(get_db)) : 

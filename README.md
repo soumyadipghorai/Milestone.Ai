@@ -2,12 +2,17 @@
 
 This project is a comprehensive software solution for managing an educational environment, enabling instructors to track students' progress through various APIs, data handling, and frontend interfaces. It includes backend services for handling AI-powered analysis, milestones, and secure data operations, along with a user-friendly frontend for instructors and students.
 
+
+<img src='UI/landing_page.png' alt="overall architecture" width=800/>
+
 ## Table of Contents
 
 - [Project Structure](#project-structure)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
+- [Architecture](#architecture)
+- [ERD](#ERD)
 - [Documentation](#documentation)
 - [Assets](#assets)
 - [Contributing](#contributing)
@@ -107,7 +112,22 @@ The backend APIs are organized to support various functionalities in this educat
 - **/generate_milestones**: Creates milestones based on project details.
 - **/best_practices**: Suggests coding best practices.
 
+
+<img src='assets/Screenshot 2025-01-08 155646.png' alt="overall architecture" width=500/>
+
 For a full list of API endpoints and their details, refer to `backend/app/AI_service/api/`.
+
+## Architecture 
+
+### Overall architecture 
+<img src='assets/Screenshot 2025-01-08 152812.png' alt="overall architecture" width=500/>
+
+### Code Analyzer 
+<img src='assets/Screenshot 2025-01-08 152839.png' alt="code analyzer" width=500/>
+
+## ERD 
+<img src='assets/diagram-export-1-8-2025-3_35_01-PM.png' alt="ERD" width=800/>
+
 
 ## Documentation
 
@@ -130,8 +150,6 @@ To contribute to this project:
 2. Create a new branch for your feature or bug fix.
 3. Commit your changes and push to the branch.
 4. Open a pull request and describe your changes.
-
-Please make sure to follow the [contributing guidelines](docs/CONTRIBUTING.md) (if available).
 
 ## License
 

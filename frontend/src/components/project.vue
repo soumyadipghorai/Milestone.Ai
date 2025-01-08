@@ -29,9 +29,14 @@
                                     </a>
 
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                    <li v-if="!notifications.length">
+                                        <span class="dropdown-item">No new notifications</span>
+                                    </li>
+                                    <li v-for="(notification, index) in notifications" :key="index">
+                                        <a class="dropdown-item" href="#" @click="markAsRead(index)">
+                                        {{ notification.message }}
+                                        </a>
+                                    </li>
                                     </ul>
                                 </div>
                             </li>
@@ -54,7 +59,7 @@
                 </div>
                 <div class="container py-4" v-else>
                     <div class="row">
-                        <div class="col-lg-8 py-4">
+                        <div class="col-lg-8">
                             <div class="card p-4">
                                 <h4 class="lh-2 px-4 pt-4 pb-2">{{ projectDashboardDetails.project_details.name }}</h4>
                                 <p class="lh-2 text-secondary px-4">{{ projectDashboardDetails.project_details.description.length > 200 ? projectDashboardDetails.project_details.description.slice(0, 200) + '...' : projectDashboardDetails.project_details.description }}</p>
@@ -210,7 +215,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4 py-4">
+                        <div class="col-lg-4">
                             <div class="card p-4 mb-3" :style="{height: '60vh'}" v-if="role === 'student'">
                                 <h4 class="lh-2">Uploaded Documents</h4>
                                 <div class="file-container overflow-auto mt-4">
@@ -364,6 +369,7 @@
         },
         data() {
             return {      
+                notifications:[],
                 user_id : null,
                 role: null,
                 blocked: true,    
@@ -402,6 +408,7 @@
                     const response = await getStudentProjectDetails(this.stduent_id);
                     this.projectDashboardDetails = response;  
                     this.currentProjectID = response.project_details.id;
+                    this.notifications=response.notifications;
                     console.log(response)
                 } catch (error) {
                     this.error = "Failed to fetch dashboard data. Please try again later.";

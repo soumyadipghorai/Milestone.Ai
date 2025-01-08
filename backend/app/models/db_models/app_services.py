@@ -222,3 +222,11 @@ class StudentSupport(Base) :
 
     student = relationship("Student", back_populates="student_feedback")
     project_details = relationship('Project', back_populates="feedback")
+
+class Notification(Base):
+    __tablename__="notification"
+    id=Column(Integer, primary_key=True, autoincrement=True)
+    role=Column(String, nullable=False)
+    content=Column(String, nullable=False)
+    status=Column(String, nullable=False)
+    milestone_id=Column(String, nullable=False, default="not_a_milestone")

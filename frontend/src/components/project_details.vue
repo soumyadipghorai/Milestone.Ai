@@ -24,9 +24,14 @@
                                     </a>
                                     
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                    <li v-if="!notifications.length">
+                                        <span class="dropdown-item">No new notifications</span>
+                                    </li>
+                                    <li v-for="(notification, index) in notifications" :key="index">
+                                        <a class="dropdown-item" href="#" @click="markAsRead(index)">
+                                        {{ notification.message }}
+                                        </a>
+                                    </li>
                                     </ul>
                                 </div>
                             </li>
@@ -193,7 +198,8 @@
         },
 
         data() {
-            return {                
+            return {  
+                notifications:[]    ,          
                 user_id : null,
                 role: null,
                 blocked: true, 
@@ -222,6 +228,7 @@
                 try {
                     const response = await getProjectDetails(this.project_id);
                     this.projectDetails = response;  
+                    this.notifications=response.notifications;
                     console.log(response)
                 } catch (error) {
                     this.error = "Failed to fetch dashboard data. Please try again later.";

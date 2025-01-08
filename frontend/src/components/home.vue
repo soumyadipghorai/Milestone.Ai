@@ -11,7 +11,7 @@
                         <ul class="navbar-nav d-flex align-items-center">
                             <li class="h-100 nav-link d-flex align-items-center"> 
                                 <router-link :to="isLoggedIn ? `/student-dashboard/${user_id}` : '/login'" class="text-decoration-none text-reset">
-                                    Stduent
+                                    Student
                                 </router-link>
                             </li>
                             <li class="h-100 nav-link d-flex align-items-center"> 
