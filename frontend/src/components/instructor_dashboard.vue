@@ -80,7 +80,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-6 my-4 my-lg-0">
                             <div class="card p-4" :style="{height: '50vh'}">
                                 <h4 class="lh-2 my-2 p-2">Student details</h4>
                                 <div class="student-info overflow-auto">
@@ -154,7 +154,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-5">
+                        <div class="col-lg-5 my-4 my-lg-0">
                             <div class="card p-4 h-100 text-light bg-primary-subtle text-dark">
                                 <h4 class="lh-2 my-2">Status Updates</h4>
                                 <div id="carouselExample" class="carousel slide">

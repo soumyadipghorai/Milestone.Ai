@@ -87,7 +87,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 my-lg-0 my-4">
                             <div class="card p-4 h-100">
                                 <div class="text-section">
                                     <h4 class="lh-2 my-2">Project Details</h4>
@@ -98,7 +98,7 @@
                                         <input type="file" id="fileInput" accept="application/pdf" class="form-control h-100" row="2" @change="onFileChange">
                                     </div> 
                                     <div class="form-check my-2">
-                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}" required>
+                                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
                                         <label class="form-check-label text-secondary" for="flexCheckDefault">
                                             Milestone would be created using AI
                                         </label>
@@ -141,7 +141,7 @@
                                 <Bar :data="barChartData" :options="barChartOptions"/>
                             </div>
                         </div>
-                        <div class="col-lg-5">
+                        <div class="col-lg-5 my-4 my-lg-0">
                             <div class="card p-4 h-100 bg-primary-subtle" >
                                 <h4 class="lh-2 my-2">Status Updates</h4>
                                 <div id="carouselExample" class="carousel slide">

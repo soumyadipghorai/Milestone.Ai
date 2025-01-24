@@ -8,6 +8,7 @@ from models.db_models import LanguageGuidelines, CodeQuality, GitHubAccount
 from models.database import get_db
 import json
 # from utils.generate_report import FeedbackGenerator
+from AI_service.controllers.generate_best_practice import GuidelineGenerator
 from utils.generate_instruction_md import convert_best_practices_to_markdown, convert_list_to_markdown
 from AI_service.llm_ops.llm_base import LLMBase
 from AI_service.schema.github_summarize import CodeSummarizationResult, OverallSummary, TestReport
@@ -134,7 +135,7 @@ class StudentReport(TestFailed, TestPassed) :
 class CodeAnalyzer(LLMBase, FetchGitContent) : 
     def __init__(
             self, username: str, student_id: str = "", checklist_id: int = 0, repo_name:str = None, branch_name: str = None, code_coverage: float = 0.3, 
-            language_coverage: float = 0.5, token_limit: int = 5000, save_to_db: bool = True
+            language_coverage: float = 0.5, token_limit: int = 5000, save_to_db: bool = True, transperancy_mode: bool = True
         ) -> None :  
         FetchGitContent.__init__(self, username=username, repo_name=repo_name)  
         LLMBase.__init__(self, prompt=GUIDELINE_CHECK, schema=CodeSummarizationResult, save_history = True)  
@@ -145,6 +146,7 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
         self.save_to_db = save_to_db
         self.checklist_id = checklist_id
         self.student_id = student_id
+        self.transperancy_mode = transperancy_mode
     
     def __find_used_languages(self) -> dict:
         response = requests.get(self.url_endpoint+'/languages') 
@@ -163,8 +165,9 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
             instructions = existing_language
             return json.loads(instructions.guideline)["best_practices"]
         
-        # ? generate entry 
-        return "couldn't find"
+        else : 
+            guideline = GuidelineGenerator().add_new_language(language_name)
+            return guideline["best_practices"]
     
     def __preprocess_code_analysis(self, history, unique_tag: str = "code_analysis") : 
         intermediate_output, final_output = {"overall_feedback" : []}, dict()
@@ -194,6 +197,7 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
         return final_output
 
     def analyze(self):
+        self.transperancy_dict = {}
         code_report = super().analyze() 
         all_paths_in_repo = self._fetch_repo_file_paths(branch=self.branch_name)
         all_languages = self.__find_used_languages() # ! assuming it is already sorted
@@ -225,7 +229,7 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
             )
             
             for j in tqdm(range(len(random_code_sample))) :
-                path = random_code_sample[j] 
+                path = random_code_sample[j]  
                 raw_file = self.__download_files(path = path, branch=self.branch_name)
                 start_point, end_point = 0, max(len(raw_file) - self.token_limit - 1, 0)
                 sample_start = random.randint(start_point, end_point)
@@ -235,6 +239,11 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
                     best_practices_list = best_practices_md, tag = "code_analysis"
                 )
                 time.sleep(3) # to avoid burning rate limit  
+                if self.transperancy_mode : 
+                    self.transperancy_dict[self.raw_file_endpoint + f"/{self.branch_name}/{path}"] = {
+                        "file_name" : path, "code" : sample_code, 
+                    }
+
 
             code_report["history"] = self.__preprocess_code_analysis(history=self.memory, unique_tag="code_analysis")   
             code_report["instructor_feedback"] = InstructorReport().generate_overall_feedback(text_content=code_report["history"]["overall_feedback"])
@@ -246,7 +255,7 @@ class CodeAnalyzer(LLMBase, FetchGitContent) :
                     instructor_feedback = json.dumps(code_report["instructor_feedback"]), overall_summary = json.dumps(code_report["student_feedback"]),
                     commit_summary = json.dumps(code_report["instructor_commit_summary"]), checklist_id = self.checklist_id, 
                     upload_time = datetime.now(), repo_name = self.repo_name, branch_name = self.branch_name, 
-                    written_by = self.student_id
+                    written_by = self.student_id, sampled_files = json.dumps(self.transperancy_dict)
                 )
 
                 new_github_entry = GitHubAccount(

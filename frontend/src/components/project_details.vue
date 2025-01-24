@@ -24,14 +24,15 @@
                                     </a>
                                     
                                     <ul class="dropdown-menu">
-                                    <li v-if="!notifications.length">
+                                    <!-- <li v-if="!notifications.length">
                                         <span class="dropdown-item">No new notifications</span>
                                     </li>
                                     <li v-for="(notification, index) in notifications" :key="index">
                                         <a class="dropdown-item" href="#" @click="markAsRead(index)">
                                         {{ notification.message }}
                                         </a>
-                                    </li>
+                                    </li> -->
+                                        <li>No New notifications</li>
                                     </ul>
                                 </div>
                             </li>
@@ -74,7 +75,7 @@
                                 <button type="button" class="btn btn-primary" @click="saveProjectDetails">Save Project Details</button>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 my-4 my-lg-0 px-md-4 px-0">
                             <div class="accordion accordion-flush" id="milestonesAccordion">
                                 <div 
                                     v-for="(milestone, milestoneIndex) in projectDetails.milestones" 

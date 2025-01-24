@@ -191,6 +191,7 @@ class CodeQuality(Base):
     commit_summary = Column(String, nullable= True)
     repo_name = Column(String, nullable= True)
     branch_name = Column(String, nullable= True)
+    sampled_files = Column(String, nullable= True)
     checklist_id = Column(String, ForeignKey("checklists.id"))
     upload_time = Column(DateTime, nullable= False) 
     

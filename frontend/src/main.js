@@ -9,7 +9,7 @@ const app = createApp(App)
 axios.defaults.baseURL = 'http//127.0.0.1.5000'
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8000', 
+    baseURL: 'https://milestone-ai.onrender.com/v1', 
   });
 
 axiosInstance.interceptors.request.use(

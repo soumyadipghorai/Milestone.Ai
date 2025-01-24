@@ -8,6 +8,7 @@ import support_dashboard from '@/components/support_dashboard.vue'
 import instructor_dashboard from '@/components/instructor_dashboard.vue'
 import project from '@/components/project.vue'
 import project_details from '@/components/project_details.vue'
+import NotFound from "@/components/not_found.vue"; // 404 component
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -71,7 +72,12 @@ const router = createRouter({
             component:project_details, 
             props: true, 
             meta: { requiresAuth: true }
-        }
+        }, 
+        {
+            path: "/:pathMatch(.*)*",
+            name: "NotFound",
+            component: NotFound,
+        },
     ]
 })
 

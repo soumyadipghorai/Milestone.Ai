@@ -10,6 +10,7 @@ from config.logs import logger
 from sqlalchemy.orm import Session
 from models.database import get_db   
 from utils.db_operations import * 
+import random
 from fastapi.responses import JSONResponse
 
 class DBOps : 
@@ -31,7 +32,7 @@ class DashboardGenerator(DBOps) :
             github_details = json.loads(self.db.query(GitHubAccount).filter(GitHubAccount.student_id == self.student_id).first().total_language) 
             if github_details:
                 return {
-                    "label" : list(github_details.keys()), "datasets" : [
+                    "labels" : list(github_details.keys()), "datasets" : [
                         {
                             "label": "Language Used",
                             "data": list(github_details.values()) ,
@@ -163,11 +164,24 @@ class StudentProjectDetails(FetchProjectReport) :
         github_username = self.db.query(Student).filter(Student.id == self.user_id).first().github_username
         for feedback in all_feedback :
             checklist_details = self.db.query(Checklist).filter(Checklist.id == feedback.checklist_id).first()
+            sample_codes = list(json.loads(feedback.sampled_files).items())
+            random.shuffle(sample_codes)
+            
+            random_sampl_code_output, i, pointer = {}, 0, 0
+            while i < 3 : 
+                if len(sample_codes[pointer][1]['code']) > 0 :
+                    random_sampl_code_output[sample_codes[pointer][0]] = sample_codes[pointer][1]
+                    i += 1
+                    pointer += 1
+                else : 
+                    pointer += 1             
+
             output.append({
                 "name" : checklist_details.name, "checklist_id" : checklist_details.id, 
                 "instructor_feedback" : json.loads(feedback.instructor_feedback), "id" : feedback.id,
                 "overall_summary" : json.loads(feedback.overall_summary), "commit_summary" : json.loads(feedback.commit_summary), 
-                "project_url" : f'{self.github_base}/{github_username}/{feedback.repo_name}/tree/{feedback.branch_name}'
+                "project_url" : f'{self.github_base}/{github_username}/{feedback.repo_name}/tree/{feedback.branch_name}', 
+                "sampled_files" : random_sampl_code_output
             }) 
 
         return output

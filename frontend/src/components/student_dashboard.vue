@@ -86,8 +86,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3">
-                            <div class="card mx-2 p-4">
+                        <div class="col-lg-3 my-lg-0 my-4">
+                            <div class="card mx-0 p-4">
                                 <h4 class="lh-2 my-2">Language Coverage</h4>
                                 <p class="lh-1">Showing for  project-1</p>
                                 <div class="fit-content">
@@ -139,7 +139,7 @@
                                 <Bar :data="barChartData" :options="barChartOptions" />
                             </div>
                         </div>
-                        <div class="col-lg-5">
+                        <div class="col-lg-5 my-lg-0 my-4">
                             <div class="card p-4 h-100 bg-dark-subtle">
                                 <h4 class="lh-2 my-2">Give Feedback</h4>
                                 <p class="lh-2 text-secondary">What do you think about current your project and instructor?</p>
@@ -148,7 +148,7 @@
                                         <textarea class="form-control text-secondary form-text-area border-secondary" id="exampleFormControlTextarea1" placeholder="Type your comment..." rows="5" :style="{backgroundColor: 'transparent'}" v-model="studentFeedback"></textarea>
                                     </div>
                                     <div class="form-check my-2">
-                                        <input class="form-check-input border-secondary" type="checkbox" value="" id="flexCheckDefault" :style="{backgroundColor: 'transparent'}" required>
+                                        <input class="form-check-input border-secondary" type="checkbox" value="" id="flexCheckDefault" required>
                                         <label class="form-check-label text-secondary" for="flexCheckDefault">
                                             It will be sent to the admin for evaluation
                                         </label>
@@ -236,8 +236,7 @@
                     responsive: true, 
                     plugins: {
                         legend: {
-                            display: true,
-                            
+                            display: false,
                         },
                     },
                     cutout: '60%', 
@@ -315,6 +314,8 @@
                     this.doughnutChartData = response.status.language_details;
                     this.barChartData = response.status.progress_chart;
                     this.notifications = response.status.notifications;
+
+                    console.log(response)
                 } else {
                     console.warn("API response did not return expected data structure.");
                 }

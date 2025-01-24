@@ -115,23 +115,36 @@
                 </div>
                 <div class="col-lg-6" :style="{ backgroundColor: 'var(--primary-dark-color)'}" :class="{ blurred: blocked }">
                     <div class="row g-2 mx-4 my-0 py-2">
-                        <div class="col-3">
-                            <button class="btn btn-danger text-light">Current Logs</button>
+                        <div class="col-6">
+                            <button class="btn btn-danger text-light" @click="updateState('logs')">Debug Logs</button>
                         </div> 
-                        <div class="col-3">
-                            <button class="btn btn-outline-success text-success">Current Info</button>
+                        <div class="col-6">
+                            <button class="btn btn-outline-success text-light" @click="updateState('info')">Info Logs</button>
                         </div> 
                     </div> 
                     <div class="card p-4" :style="{backgroundColor : 'var(--primary-dark-color)', height: '100vh', border: 'none'}">
                         <div class="logs-holder overflow-auto"> 
-                            <div class="log-message" v-for="(logMessage, logMessageIndex) in dashboardData.info" :key="'info-'+logMessageIndex">
-                                <p class="lh-2">
-                                    <span class="text-secondary">{{ logMessage.time_stamp }} - </span>
-                                    <span class="text-danger">{{ logMessage.source }} - </span>
-                                    <span class="text-primary">{{ logMessage.log_type }} - </span>
-                                    <span class="text-light">{{ logMessage.log_message }}</span>
-                                </p>
+                            <div v-if="currentState === 'logs'">
+                                <div class="log-message" v-for="(logMessage, logMessageIndex) in dashboardData.debug" :key="'info-'+logMessageIndex">
+                                    <p class="lh-2">
+                                        <span class="text-secondary">{{ logMessage.time_stamp }} - </span>
+                                        <span class="text-danger">{{ logMessage.source }} - </span>
+                                        <span class="text-primary">{{ logMessage.log_type }} - </span>
+                                        <span class="text-light">{{ logMessage.log_message }}</span>
+                                    </p>
+                                </div>
                             </div>
+                            <div v-else>
+                                <div class="log-message" v-for="(logMessage, logMessageIndex) in dashboardData.info" :key="'info-'+logMessageIndex">
+                                    <p class="lh-2">
+                                        <span class="text-secondary">{{ logMessage.time_stamp }} - </span>
+                                        <span class="text-danger">{{ logMessage.source }} - </span>
+                                        <span class="text-primary">{{ logMessage.log_type }} - </span>
+                                        <span class="text-light">{{ logMessage.log_message }}</span>
+                                    </p>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -169,6 +182,7 @@
                 role: null,
                 blocked: true,   
                 loading: true,
+                currentState: 'logs',
                 doughnutChartData: {
                     labels: ['Python', 'Js', 'HTML', 'Others'],  
                     datasets: [
@@ -205,6 +219,10 @@
                 localStorage.removeItem('role');  
                 this.$router.push('/login');  
             },
+            updateState(newState) {
+                this.currentState = newState; 
+            },
+
             async fetchDashboard() {
                 try {
                     const response = await getSupportDashboard(this.user_id);

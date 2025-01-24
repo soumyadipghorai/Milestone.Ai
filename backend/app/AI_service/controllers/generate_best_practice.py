@@ -4,6 +4,7 @@ from store.prompt_store import GENERATE_BEST_PRACTICES
 from _temp.config import LANGUAGE_TO_EXTENSION
 from models.database import get_db
 from models.db_models import LanguageGuidelines
+from utils.db_operations import add_entry
 from tqdm import tqdm
 
 class GuidelineGenerator(LLMBase) : 
@@ -25,3 +26,9 @@ class GuidelineGenerator(LLMBase) :
                 return {"message" : "success", "language" : language}
             
         return {"message" : "success", "language" : "all"}
+    
+    def add_new_language(self, language: str) -> dict: 
+        llm_output = self.generate_output(language = language) 
+        new_language = LanguageGuidelines(name = language, guideline = llm_output)
+        added_entry = add_entry(entry = new_language, success_key="id", success_value= new_language.name)
+        return llm_output

@@ -192,7 +192,7 @@
                                                                                     </select>
                                                                                 </div>
                                                                                 <div class="form-check my-2">
-                                                                                    <input class="form-check-input" type="checkbox" value="" id="flexcodeCheckDefault" :style="{backgroundColor: 'transparent', color: 'black'}" required>
+                                                                                    <input class="form-check-input" type="checkbox" value="" id="flexcodeCheckDefault" :style="{color: 'black'}" required>
                                                                                     <label class="form-check-label text-secondary" for="flexcodeCheckDefault">
                                                                                         Codes will be analyzed by AI
                                                                                     </label>
@@ -216,7 +216,7 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="card p-4 mb-3" :style="{height: '60vh'}" v-if="role === 'student'">
+                            <div class="card p-4 mb-3 mt-lg-0 mt-4" :style="{height: '60vh'}" v-if="role === 'student'">
                                 <h4 class="lh-2">Uploaded Documents</h4>
                                 <div class="file-container overflow-auto mt-4">
                                     <div class="accordion accordion-flush" id="accordionFlushExample">
@@ -321,6 +321,17 @@
                                                             <h6 class="text-dark">{{ testCase }} : </h6>
                                                             <p class="p-0" :class="{ 'text-success': result.result === 'passed', 'text-danger': result.result !== 'passed' }">{{ result.result }}</p>
                                                             <p class="text-secondary p-0">{{result.feedback.description}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="sampled-files mb-3">
+                                                        <h5 class="lh-2 my-3">Sampled codes :</h5>
+                                                        <div class="testcase mx-0 my-4 border-bottom" v-for="(result, fileName, fileNameIndex) in codeFeedback.sampled_files" :key="fileNameIndex">
+                                                            <p class="lh-1 text-dark">
+                                                                <a :href="fileName" class="btn btn-outline-secondary mx-0" target="_blank">{{ result.file_name }}</a>
+                                                            </p>
+                                                            <pre>
+                                                                <code class="p-0">{{ result.code }}</code>
+                                                            </pre>
                                                         </div>
                                                     </div>
                                                     <div class="instructor-feedback mb-3" v-if="role !== 'student'">
