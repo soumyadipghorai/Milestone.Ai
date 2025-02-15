@@ -184,7 +184,7 @@
                     <div class="footer-branding">
                         <h4 class="lh-2 text-lg-start text-center" :style="{color : 'white'}"><a class="navbar-brand" href="/">Milestone<span :style="{ color: 'var(--primary-blue-color)' }">.Ai</span></a></h4>
                         <div class="bg-light rounded-2 p-2">
-                            <a href="https://github.com/22f3002024/soft-engg-project-sep-2024-se-sep-27/tree/ghorai" class="text-decoration-none text-reset" target="_blank">
+                            <a href="https://github.com/soumyadipghorai/Milestone.Ai" class="text-decoration-none text-reset" target="_blank">
                                 <div class="row m-0">
                                     <div class="col-8">
                                         GitHub
@@ -214,7 +214,7 @@
                 </div>
             </div>
             <div class="copyright text-center text-light">
-                Developed with ❤️ by Team 27
+                Developed with ❤️ by Soumyadip Ghorai
             </div>
         </div>
     </div>
